@@ -4,11 +4,16 @@ import java.io.IOException;
 import java.net.Socket;
 
 public class Client extends Thread {
+	public enum State {
+		LOBBY, MORPION
+	};
+
 	private static int ids = 0; // Nombre de clients qui se sont connectés au serveur.
 
 	private final int id; // Id du client.
 	private ClientCommunicationHandler communication;
 	private String pseudo = null;
+	private State state = State.LOBBY;
 	volatile private String buffer = null;
 
 	public Client(Socket socket) {
@@ -37,17 +42,24 @@ public class Client extends Thread {
 		while (true) {
 			try {
 				String str = getCommunicationHandler().read();
-				if (str.startsWith("NC")) {
-					pseudo = str.substring(2);
-					System.out.println("Client " + id + " logged as " + pseudo);
-				} else if (str.startsWith("\n")) {
-					preStop();
-					return;
-				} else if (str.startsWith("P")) {
-					buffer = str;
-				} else if (str.startsWith("C")) {// Chat
-				} else {
-					communication.send("Back : " + str);
+				switch (state) {
+				case LOBBY:
+					if (str.startsWith("NC")) {
+						pseudo = str.substring(2);
+						System.out.println("Client " + id + " logged as " + pseudo);
+					} else if (str.startsWith("\n")) {
+						preStop();
+						return;
+					} else if (str.startsWith("M")) {
+						state = State.MORPION;
+					}
+					break;
+				case MORPION:
+					if (str.startsWith("P")) {
+						buffer = str;
+					}
+					break;
+
 				}
 			} catch (NullPointerException e) {
 				preStop();
@@ -70,5 +82,9 @@ public class Client extends Thread {
 
 	public void clearBuffer() {
 		buffer = null;
+	}
+
+	public State getGameState() {
+		return state;
 	}
 }

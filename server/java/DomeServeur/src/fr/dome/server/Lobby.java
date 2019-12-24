@@ -6,8 +6,9 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 import fr.dome.games.Morpion;
+import fr.dome.server.Client.State;
 
-public class Serveur implements Runnable {
+public class Lobby implements Runnable {
 
 	private static final int ERROR_SERVER = 2;
 	private ArrayList<Client> clients = new ArrayList<Client>();
@@ -22,12 +23,12 @@ public class Serveur implements Runnable {
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
-		Serveur s = new Serveur();
+		Lobby s = new Lobby();
 		Thread t = new Thread(s);
 		t.start();
 	}
 
-	public Serveur() {
+	public Lobby() {
 		try {
 			socket = new ServerSocket(PORT);
 			System.out.println(socket.getInetAddress().toString());
@@ -44,11 +45,10 @@ public class Serveur implements Runnable {
 				Client c = new Client(socket.accept());
 				clients.add(c);
 				c.start();
-				if (clients.size() == 2)
-					break;
+				if (clients.size() == 2) break;
 			}
 			while (isRunning) {
-				if (clients.stream().allMatch((c1) -> c1.isInitialized())) {
+				if (clients.stream().allMatch((c1) -> c1.isInitialized() && c1.getGameState() == State.MORPION)) {
 					Morpion m = new Morpion(clients.get(0), clients.get(1));
 					clients.remove(1);
 					clients.remove(0);
@@ -60,9 +60,5 @@ public class Serveur implements Runnable {
 			e.printStackTrace();
 		}
 		run();
-	}
-
-	public void kill() {
-
 	}
 }
