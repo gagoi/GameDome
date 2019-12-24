@@ -1,36 +1,50 @@
+package fr.dome.games;
 import java.util.ArrayList;
 
-public class Morpion extends Thread {
+import fr.dome.server.Client;
+
+public class Morpion extends Game {
 
 	private static final char[] TOKENS = {'X', 'O'};
-	ArrayList<Client> clients = new ArrayList<Client>();
 	private char grid[][] = { { ' ', ' ', ' ' }, { ' ', ' ', ' ' }, { ' ', ' ', ' ' } };
-	private boolean hasWin = false;
 
 	public Morpion(Client j1, Client j2) {
+		clients = new ArrayList<Client>(2);
 		clients.add(j1);
 		clients.add(j2);
+		turn = (int) (Math.random() * 2);
+		nbPlayers = 2;
 	}
 
 	@Override
 	public void run() {
-		int turn = (int) (Math.random() * 2);
 		sendAll("S");
 		System.out.println("Start");
+		Client actual;
 		do {
-			clients.get(turn).send("T");
-			sendGrid();
-			int c = readPlacement(turn);
-			if (isPlacementAvailable(c)) {
-				grid[c / 3][c % 3] = TOKENS[turn];
+			actual = clients.get(turn);
+			buffer = null;
+			actual.getCommunicationHandler().send("T");
+			draw();
+
+			int pos = readPlacement(waitforbuffer(actual));
+			
+			if (isPlacementAvailable(pos)) {
+				grid[pos / 3][pos % 3] = TOKENS[turn];
+				
+			} else {
+				continue;
 			}
+			
 			hasWin = checkWin(TOKENS[turn]);
-			turn++;
-			turn %= 2;
+			nextTurn();
 		} while (!hasWin);
+		draw();
+		actual.getCommunicationHandler().send("GG");
+		clients.get(turn).getCommunicationHandler().send("L");
 	}
 
-	private void sendGrid() {
+	protected void draw() {
 		StringBuilder str = new StringBuilder();
 		str.append('G');
 		for (int i = 0; i < 3; ++i)
@@ -42,14 +56,12 @@ public class Morpion extends Thread {
 
 	private void sendAll(String str) {
 		clients.forEach((c) -> {
-			c.send(str.toString());
+			c.getCommunicationHandler().send(str.toString());
 		});
 	}
 
-	private int readPlacement(int turn) {
-		String str = clients.get(turn).read();
-		if (str.startsWith("P")) return Integer.parseInt(str.substring(1));
-		else return -1;
+	private int readPlacement(String input) {
+		return Integer.parseInt(input.substring(1));
 	}
 	
 	private boolean isPlacementAvailable(int c) {
@@ -69,5 +81,18 @@ public class Morpion extends Thread {
 		boolean d2 = grid[0][2] == grid[1][1] && grid[1][1] == grid[2][0] && grid[0][2] == token; 
 		
 		return l1 || l2 || l3 || c1 || c2 || c3 || d1 || d2;
+	}
+	
+	public String waitforbuffer(Client c) {
+		while (c.getBuffer() == null) {
+			try {
+				Thread.sleep(50);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		String str = c.getBuffer();
+		c.clearBuffer();
+		return str;
 	}
 }
