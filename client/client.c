@@ -1,21 +1,55 @@
 #include "client.h"
+#include "connect.h"
 
 
-int main()
+#define MAX 80
+
+void play(char* buff){
+    int n;
+    bzero(buff, sizeof(buff));
+    printf("Where to play: ");
+    n = 0;
+    while ((buff[n++] = getchar()) != '\n');
+    buff[strlen(buff)-1] = 0;
+    //return buff;
+
+}
+int main(int argc, char * argv[])
 {
+    int sock;
+    sock = initconnect(argc, argv);
+    printf("%d\n", sock);
+//    char buffer[MAX];
+//    bzero(buffer,sizeof(buffer));
+//    int b;
+//    b = recv(sock,buffer,sizeof(buffer),0);
+//    if(b>0){
+//        printf("%s, %d, %d\n", buffer, sizeof(buffer),b);
+//    }
     int stop = 0;
     grid_t morpion;
-
     init_grid(&morpion);
-
-    morpion.val[1][0] = P1_TOKEN;
-
+    //morpion.val[1][0] = P1_TOKEN;
     initscr();
+    char buff[10];
+    char test = 'a';
+
     while (!stop)
     {
+
         draw(&morpion);
-        if (getch() == 'q')
+        char c = getch();
+        if (c == 'q')
             stop = 1;
+        else {
+            mvaddch(10, 10, test);
+            refresh();
+        }
+        test ++;
+
+        //play(buff)
+
+
     }
     endwin();
     return 0;
@@ -44,6 +78,6 @@ void init_grid(grid_t * grid)
     unsigned int i;
     for (i = 0; i < 3; ++i)
     {
-        memset(grid->val[i], P2_TOKEN, 3 * sizeof(char));
+        memset(grid->val[i], ' ', 3 * sizeof(char));
     }
 }

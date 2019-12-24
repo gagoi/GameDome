@@ -74,6 +74,9 @@ public class Client extends Thread {
 		while (isRunning) {
 			try {
 				switch(read()) {
+					case "NC":
+						System.out.println("newplayer");
+						break;
 				}
 			} catch (IOException e) { // Il y a un problème de connection avec le client.
 				preStop(); // On déconnecte complètement.
