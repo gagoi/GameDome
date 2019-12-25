@@ -3,17 +3,16 @@ package fr.dome.server;
 import java.io.IOException;
 import java.net.Socket;
 
+import fr.dome.games.GameState;
+
 public class Client extends Thread {
-	public enum State {
-		LOBBY, MORPION
-	};
 
 	private static int ids = 0; // Nombre de clients qui se sont connectés au serveur.
 
 	private final int id; // Id du client.
 	private ClientCommunicationHandler communication;
 	private String pseudo = null;
-	private State state = State.LOBBY;
+	private GameState state = GameState.LOBBY;
 	volatile private String buffer = null;
 
 	public Client(Socket socket) {
@@ -51,7 +50,7 @@ public class Client extends Thread {
 						preStop();
 						return;
 					} else if (str.startsWith("M")) {
-						state = State.MORPION;
+						state = GameState.MORPION;
 					}
 					break;
 				case MORPION:
@@ -84,7 +83,7 @@ public class Client extends Thread {
 		buffer = null;
 	}
 
-	public State getGameState() {
+	public GameState getGameState() {
 		return state;
 	}
 }

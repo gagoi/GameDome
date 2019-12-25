@@ -1,6 +1,6 @@
 package fr.dome.games;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import fr.dome.server.Client;
 
@@ -9,12 +9,8 @@ public class Morpion extends Game {
 	private static final char[] TOKENS = { 'X', 'O' };
 	private char grid[][] = { { ' ', ' ', ' ' }, { ' ', ' ', ' ' }, { ' ', ' ', ' ' } };
 
-	public Morpion(Client j1, Client j2) {
-		clients = new ArrayList<Client>(2);
-		clients.add(j1);
-		clients.add(j2);
-		turn = (int) (Math.random() * 2);
-		nbPlayers = 2;
+	public Morpion(List<Client> clients) {
+		super(clients, 2);
 	}
 
 	@Override
@@ -109,5 +105,9 @@ public class Morpion extends Game {
 		String str = c.getBuffer();
 		c.clearBuffer();
 		return str;
+	}
+	
+	static public int getNbPlayers() {
+		return 2;
 	}
 }

@@ -1,21 +1,23 @@
 package fr.dome.server;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
+import fr.dome.games.GameState;
 import fr.dome.games.Morpion;
-import fr.dome.server.Client.State;
 
 public class Lobby implements Runnable {
 
 	private static final int ERROR_SERVER = 2;
-	private ArrayList<Client> clients = new ArrayList<Client>();
+	volatile private ArrayList<Client> clients = new ArrayList<Client>();
 
 	private final int PORT = 45703;
 	private ServerSocket socket;
 	private boolean isRunning = true;
+	private GameLauncher launcher;
 
 	public static void main(String[] args) {
 		try {
@@ -29,6 +31,7 @@ public class Lobby implements Runnable {
 	}
 
 	public Lobby() {
+		launcher = new GameLauncher(clients);
 		try {
 			socket = new ServerSocket(PORT);
 			System.out.println(socket.getInetAddress().toString());
@@ -45,11 +48,15 @@ public class Lobby implements Runnable {
 				Client c = new Client(socket.accept());
 				clients.add(c);
 				c.start();
-				if (clients.size() == 2) break;
+				if (clients.size() == 2)
+					break;
 			}
 			while (isRunning) {
-				if (clients.stream().allMatch((c1) -> c1.isInitialized() && c1.getGameState() == State.MORPION)) {
-					Morpion m = new Morpion(clients.get(0), clients.get(1));
+				if (clients.stream().allMatch((c1) -> c1.isInitialized() && c1.getGameState() == GameState.MORPION)) {
+					ArrayList<Client> cli = new ArrayList<Client>(2);
+					cli.add(clients.get(1));
+					cli.add(clients.get(0));
+					Morpion m = new Morpion(cli);
 					clients.remove(1);
 					clients.remove(0);
 					m.start();
