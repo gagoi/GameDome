@@ -23,13 +23,6 @@ public class Morpion extends Game {
 		sendAll(str.toString());
 	}
 
-	private void sendAll(String str) {
-		clients.forEach((c) -> {
-			c.getCommunicationHandler().write(str.toString());
-			c.getCommunicationHandler().flush();
-		});
-	}
-
 	private int readPlacement(String input) {
 		return Integer.parseInt(input.substring(1));
 	}
@@ -88,12 +81,13 @@ public class Morpion extends Game {
 			actual = clients.get(turn);
 			actual.getCommunicationHandler().write("T");
 			draw();
-
+			
+			emergencyExit(actual); // Test de deco.
+			
 			int pos = readPlacement(waitforbuffer(actual));
 
 			if (isPlacementAvailable(pos)) {
 				grid[pos / 3][pos % 3] = TOKENS[turn];
-
 			} else {
 				continue;
 			}

@@ -48,5 +48,20 @@ public abstract class Game extends Thread {
 	protected void nextTurn() {
 		turn = (turn + 1) % nbPlayers;
 	}
+	
+	protected void emergencyExit(Client actual) {
+		if (!actual.isAlive())
+		{
+			clients.remove(actual);
+			sendAll("GG");
+			return;
+		}
+	}
 
+	protected void sendAll(String str) {
+		clients.forEach((c) -> {
+			c.getCommunicationHandler().write(str.toString());
+			c.getCommunicationHandler().flush();
+		});
+	}
 }
