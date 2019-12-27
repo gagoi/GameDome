@@ -6,15 +6,12 @@ import java.net.ServerSocket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
-import fr.dome.games.GameState;
-import fr.dome.games.Morpion;
-
 public class Lobby implements Runnable {
 
 	private static final int ERROR_SERVER = 2;
 	volatile private ArrayList<Client> clients = new ArrayList<Client>();
 
-	private final int PORT = 45704;
+	private final int PORT = 45703;
 	private ServerSocket socket;
 	private boolean isRunning = true;
 	private GameLauncher launcher;
@@ -43,7 +40,7 @@ public class Lobby implements Runnable {
 
 	@Override
 	public void run() {
-		launcher.start();
+		launcher.start();	
 		try {
 			while (isRunning) {
 				Client c = new Client(socket.accept());

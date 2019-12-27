@@ -20,7 +20,6 @@ public class Morpion extends Game {
 		Client actual;
 		do {
 			actual = clients.get(turn);
-			buffer = null;
 			actual.getCommunicationHandler().write("T");
 			draw();
 
@@ -95,18 +94,18 @@ public class Morpion extends Game {
 	}
 
 	public String waitforbuffer(Client c) {
-		while (c.getBuffer() == null) {
-			try {
-				Thread.sleep(50);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+		try {
+			synchronized (c) {
+				c.wait();
 			}
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
 		}
 		String str = c.getBuffer();
 		c.clearBuffer();
 		return str;
 	}
-	
+
 	static public int getNbPlayers() {
 		return 2;
 	}

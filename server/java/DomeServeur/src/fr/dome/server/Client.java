@@ -13,7 +13,7 @@ public class Client extends Thread {
 	private ClientCommunicationHandler communication;
 	private String pseudo = null;
 	private GameState state = GameState.LOBBY;
-	volatile private String buffer = null;
+	private String buffer = new String();
 
 	public Client(Socket socket) {
 		try {
@@ -24,23 +24,17 @@ public class Client extends Thread {
 		this.id = ++ids;
 		System.out.println("Client " + id + " connected.");
 	}
-
+	
 	public void preStop() {
 		System.out.println("Client " + id + " disconnected");
 	}
-
-	/*
-	 * public String read() { String str = ""; try { str = read(in); } catch
-	 * (IOException e) { e.printStackTrace(); preStop(); } if (str.equals("")) {
-	 * System.out.println("Client " + id + " disconnected"); } else
-	 * System.out.println(id + " : " + str); return str; }
-	 * 
-	 */
+	
 	@Override
 	public void run() {
 		while (true) {
 			try {
 				String str = getCommunicationHandler().read();
+				
 				switch (state) {
 				case LOBBY:
 					if (str.startsWith("NC")) {
@@ -55,7 +49,10 @@ public class Client extends Thread {
 					break;
 				case MORPION:
 					if (str.startsWith("P")) {
-						buffer = str;
+						synchronized (this) {
+							buffer = str;
+							notify();
+						}
 					}
 					break;
 
