@@ -2,6 +2,7 @@ package fr.dome.games;
 
 import java.util.List;
 import fr.dome.server.Client;
+import fr.dome.server.Lobby;
 
 public abstract class Game extends Thread {
 
@@ -10,13 +11,57 @@ public abstract class Game extends Thread {
 	protected int nbPlayers;
 	protected boolean hasWin = false;
 	protected String buffer = null;
-	
+
+	public Game(List<Client> clients, int nbPlayers) {
+		this.nbPlayers = nbPlayers;
+		this.clients = clients;
+		this.turn = (int) (Math.random() * nbPlayers);
+	}
+
 	@Override
-	abstract public void run();
-	
+	public void run() {
+		init();
+		loop();
+		end();
+	}
+
+	protected void init() {
+	}
+
+	abstract protected void loop();
+
+	protected void end() {
+		while (!clients.isEmpty()) {
+			Client client = clients.get(0);
+			client.clearGameState();
+			Lobby.getInstance().insertClient(client);
+			clients.remove(client);
+		}
+	}
+
 	abstract protected void draw();
-	
+
+	static public int getNbPlayers() {
+		return 0;
+	}
+
 	protected void nextTurn() {
 		turn = (turn + 1) % nbPlayers;
+	}
+	
+	protected void emergencyExit(Client actual) {
+		if (!actual.isAlive())
+		{
+			clients.remove(actual);
+			sendAll("GG");
+			return;
+		}
+	}
+
+	protected void sendAll(String str) {
+		clients.forEach((c) -> {
+			c.getCommunicationHandler().write(str.toString());
+			c.getCommunicationHandler().flush();
+		});
 	}
 }
