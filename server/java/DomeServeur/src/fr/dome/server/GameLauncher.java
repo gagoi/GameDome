@@ -10,6 +10,7 @@ import fr.dome.games.GameState;
 
 public class GameLauncher extends Thread {
 
+	
 	private List<Client> clients;
 	private HashMap<GameState, GamePendingList> games_list = new HashMap<GameState, GameLauncher.GamePendingList>();
 

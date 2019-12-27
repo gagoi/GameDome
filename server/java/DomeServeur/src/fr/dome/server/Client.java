@@ -26,6 +26,7 @@ public class Client extends Thread {
 	}
 	
 	public void preStop() {
+		Lobby.getInstance().disconnect(this);
 		System.out.println("Client " + id + " disconnected");
 	}
 	
@@ -39,7 +40,7 @@ public class Client extends Thread {
 				case LOBBY:
 					if (str.startsWith("NC")) {
 						pseudo = str.substring(2);
-						System.out.println("Client " + id + " logged as " + pseudo);
+						//System.out.println("Client " + id + " logged as " + pseudo);
 					} else if (str.startsWith("\n")) {
 						preStop();
 						return;
@@ -82,5 +83,17 @@ public class Client extends Thread {
 
 	public GameState getGameState() {
 		return state;
+	}
+
+	public void clearGameState() {
+		state = GameState.LOBBY;
+	}
+	
+	public String getPseudo() {
+		return pseudo;
+	}
+	
+	public int getClientId() {
+		return id;
 	}
 }

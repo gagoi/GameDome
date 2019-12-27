@@ -1,33 +1,22 @@
 package fr.dome.server;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.ServerSocket;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 
-public class Lobby implements Runnable {
+public class Lobby extends Thread {
 
 	private static final int ERROR_SERVER = 2;
-	volatile private ArrayList<Client> clients = new ArrayList<Client>();
+	volatile private static boolean isRunning = true;
+	volatile private static ArrayList<Client> clients = new ArrayList<Client>();
 
-	private final int PORT = 45703;
-	private ServerSocket socket;
-	private boolean isRunning = true;
-	private GameLauncher launcher;
+	private static final int PORT = 45703;
+	private static ServerSocket socket;
+	private static GameLauncher launcher;
 
-	public static void main(String[] args) {
-		try {
-			System.out.println(InetAddress.getLocalHost());
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		}
-		Lobby s = new Lobby();
-		Thread t = new Thread(s);
-		t.start();
-	}
+	private static Lobby lobby;
 
-	public Lobby() {
+	private Lobby() {
 		launcher = new GameLauncher(clients);
 		try {
 			socket = new ServerSocket(PORT);
@@ -40,7 +29,7 @@ public class Lobby implements Runnable {
 
 	@Override
 	public void run() {
-		launcher.start();	
+		launcher.start();
 		try {
 			while (isRunning) {
 				Client c = new Client(socket.accept());
@@ -49,6 +38,27 @@ public class Lobby implements Runnable {
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+	}
+
+	public static synchronized Lobby getInstance() {
+		if (lobby == null)
+			lobby = new Lobby();
+		return lobby;
+	}
+
+	public void insertClient(Client c) {
+		System.out.println("Et paf tu t'insères : ");
+		clients.add(c);
+	}
+
+	public ArrayList<Client> getPlayerList() {
+		return clients;
+	}
+
+	public void disconnect(Client client) {
+		synchronized (clients) {
+			clients.remove(client);
 		}
 	}
 }

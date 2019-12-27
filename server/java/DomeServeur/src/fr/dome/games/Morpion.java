@@ -13,37 +13,6 @@ public class Morpion extends Game {
 		super(clients, 2);
 	}
 
-	@Override
-	public void run() {
-		sendAll("S");
-		System.out.println("Start");
-		Client actual;
-		do {
-			actual = clients.get(turn);
-			actual.getCommunicationHandler().write("T");
-			draw();
-
-			int pos = readPlacement(waitforbuffer(actual));
-
-			if (isPlacementAvailable(pos)) {
-				grid[pos / 3][pos % 3] = TOKENS[turn];
-
-			} else {
-				continue;
-			}
-
-			hasWin = checkWin(TOKENS[turn]) || isFull();
-			nextTurn();
-		} while (!hasWin);
-		draw();
-		if (checkWin(TOKENS[turn]) || checkWin(TOKENS[(turn + 1) % 2])) {
-			actual.getCommunicationHandler().send("GG");
-			clients.get(turn).getCommunicationHandler().send("L");
-		} else {
-			sendAll("E");
-		}
-	}
-
 	protected void draw() {
 		StringBuilder str = new StringBuilder();
 		str.append('G');
@@ -108,5 +77,36 @@ public class Morpion extends Game {
 
 	static public int getNbPlayers() {
 		return 2;
+	}
+
+	@Override
+	protected void loop() {
+		sendAll("S");
+		System.out.println("Start");
+		Client actual;
+		do {
+			actual = clients.get(turn);
+			actual.getCommunicationHandler().write("T");
+			draw();
+
+			int pos = readPlacement(waitforbuffer(actual));
+
+			if (isPlacementAvailable(pos)) {
+				grid[pos / 3][pos % 3] = TOKENS[turn];
+
+			} else {
+				continue;
+			}
+
+			hasWin = checkWin(TOKENS[turn]) || isFull();
+			nextTurn();
+		} while (!hasWin);
+		draw();
+		if (checkWin(TOKENS[turn]) || checkWin(TOKENS[(turn + 1) % 2])) {
+			actual.getCommunicationHandler().send("GG");
+			clients.get(turn).getCommunicationHandler().send("L");
+		} else {
+			sendAll("E");
+		}
 	}
 }
