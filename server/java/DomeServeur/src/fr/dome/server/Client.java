@@ -24,28 +24,32 @@ public class Client extends Thread {
 		this.id = ++ids;
 		System.out.println("Client " + id + " connected.");
 	}
-	
+
 	public void preStop() {
 		Lobby.getInstance().disconnect(this);
 		System.out.println("Client " + id + " disconnected");
 	}
-	
+
 	@Override
 	public void run() {
 		while (true) {
 			try {
 				String str = getCommunicationHandler().read();
-				
+
 				switch (state) {
 				case LOBBY:
 					if (str.startsWith("NC")) {
 						pseudo = str.substring(2);
-						//System.out.println("Client " + id + " logged as " + pseudo);
+						// System.out.println("Client " + id + " logged as " + pseudo);
 					} else if (str.startsWith("\n")) {
 						preStop();
 						return;
-					} else if (str.startsWith("M")) {
-						state = GameState.MORPION;
+					} else {
+						for (GameState g : GameState.values()) {
+							if (g != GameState.LOBBY)
+								if (str.startsWith(g.getCode()))
+									state = g;
+						}
 					}
 					break;
 				case MORPION:
@@ -88,11 +92,11 @@ public class Client extends Thread {
 	public void clearGameState() {
 		state = GameState.LOBBY;
 	}
-	
+
 	public String getPseudo() {
 		return pseudo;
 	}
-	
+
 	public int getClientId() {
 		return id;
 	}

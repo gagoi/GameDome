@@ -24,7 +24,11 @@ public class Morpion extends Game {
 	}
 
 	private int readPlacement(String input) {
-		return Integer.parseInt(input.substring(1));
+		try {
+			return Integer.parseInt(input.substring(1));
+		} catch (StringIndexOutOfBoundsException | NumberFormatException e) {
+			return -1;
+		}
 	}
 
 	private boolean isPlacementAvailable(int c) {
@@ -82,9 +86,16 @@ public class Morpion extends Game {
 			actual.getCommunicationHandler().write("T");
 			draw();
 			
+
 			emergencyExit(actual); // Test de deco.
-			
 			int pos = readPlacement(waitforbuffer(actual));
+			
+			if (pos == 9 || pos == -1) {
+				actual.getCommunicationHandler().send("L");
+				clients.remove(actual);
+				sendAll("GG");
+				return;
+			}
 
 			if (isPlacementAvailable(pos)) {
 				grid[pos / 3][pos % 3] = TOKENS[turn];

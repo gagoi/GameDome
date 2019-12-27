@@ -48,7 +48,6 @@ public class Lobby extends Thread {
 	}
 
 	public void insertClient(Client c) {
-		System.out.println("Et paf tu t'insères : ");
 		clients.add(c);
 	}
 

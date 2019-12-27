@@ -16,7 +16,9 @@ public class GameLauncher extends Thread {
 
 	public GameLauncher(List<Client> clients) {
 		this.clients = clients;
-		games_list.put(GameState.MORPION, new GamePendingList());
+		for (GameState g : GameState.values())
+			if (g != GameState.LOBBY)
+			games_list.put(g, new GamePendingList());
 	}
 
 	@Override
