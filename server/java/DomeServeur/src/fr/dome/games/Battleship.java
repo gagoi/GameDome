@@ -44,7 +44,7 @@ public class Battleship extends Game {
 		nextTurn();
 		actual = clients.get(turn);
 		sendAll("SS");
-		actual.getCommunicationHandler().send("T-1");
+		actual.getCommunicationHandler().send("Kkkkkkk");
 	}
 
 	@Override
@@ -60,12 +60,16 @@ public class Battleship extends Game {
 		boolean hasTouch = false;
 		for (Boat boat : b) {
 			if (boat.isHitted(x, y)) {
-				actual.getCommunicationHandler().send("BT" + x + "/" + y);
-				other.getCommunicationHandler().send("PT" + x + "/" + y);
 				hasTouch = true;
+				
+				nextTurn();
+				actual = clients.get(turn);
 				if (boat.isSunk()) {
-					actual.getCommunicationHandler().send("BC" + x + "/" + y);
-					other.getCommunicationHandler().send("PC" + x + "/" + y);
+					actual.getCommunicationHandler().send("BC" + boat.getStart().x + "/" + boat.getStart().y + "/" + boat.getEnd().x + "/" + boat.getEnd().y);
+					other.getCommunicationHandler().send("PC" + boat.getStart().x + "/" + boat.getStart().y + "/" + boat.getEnd().x + "/" + boat.getEnd().y);
+				} else {
+					actual.getCommunicationHandler().send("BT" + x + "/" + y);
+					other.getCommunicationHandler().send("PT" + x + "/" + y);
 				}
 				break;
 			}
@@ -101,17 +105,20 @@ public class Battleship extends Game {
 		private final Point[] cases;
 
 		public Boat(int x, int y, int xf, int yf) {
+			System.out.println("Bateau");
 			if (x == xf) {
-				states = new boolean[yf - y];
-				cases = new Point[yf - y];
+				states = new boolean[yf - y + 1];
+				cases = new Point[yf - y + 1];
 				for (int i = 0; i < cases.length; i++) {
-					cases[i] = new Point(xf - x, yf - y - i);
+					cases[i] = new Point(x, y + i);
+					System.out.println("\t" + cases[i].x + ";" + cases[i].y);
 				}
 			} else {
-				states = new boolean[xf - x];
-				cases = new Point[xf - x];
+				states = new boolean[xf - x + 1];
+				cases = new Point[xf - x + 1];
 				for (int i = 0; i < cases.length; i++) {
-					cases[i] = new Point(xf - x - i, yf - y);
+					cases[i] = new Point(x + i, y);
+					System.out.println("\t" + cases[i].x + ";" + cases[i].y);
 				}
 			}
 		}
@@ -141,6 +148,14 @@ public class Battleship extends Game {
 					+ cases[cases.length - 1].y;
 		}
 
+		public Point getStart() {
+			return cases[0];
+		}
+		
+		public Point getEnd() {
+			return cases[cases.length - 1];
+		}
+		
 	}
 
 }
