@@ -1,16 +1,10 @@
 package fr.dome.server;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Scanner;
 
 public class Serveur {
 	public static void main(String[] args) {
-		try {
-			System.out.println(InetAddress.getLocalHost());
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		}
+
 		Lobby.getInstance().start();
 
 		Scanner sc = new Scanner(System.in);
@@ -31,6 +25,6 @@ public class Serveur {
 				break;
 			}
 		}
-		
+
 	}
 }
