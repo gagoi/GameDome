@@ -53,14 +53,16 @@ public class GameLauncher extends Thread {
 	}
 
 	@SuppressWarnings("serial")
-	class GamePendingList extends ArrayBlockingQueue<Client> {
-		public GamePendingList() {
-			super(5);
+	class GameLobby extends ArrayList<Client> {
+
+		private GameState s;
+		
+		public GameLobby(GameState s) {
+			super(2);
+			this.s = s;
 		}
 
-		private State s;
-
-		public State getState() {
+		public GameState getState() {
 			return s;
 		}
 	}
