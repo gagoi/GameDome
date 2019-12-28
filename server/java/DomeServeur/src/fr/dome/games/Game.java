@@ -11,6 +11,9 @@ public abstract class Game extends Thread {
 	protected int nbPlayers;
 	protected boolean hasWin = false;
 	protected String buffer = null;
+	protected int winner;
+
+	protected Client actual;
 
 	public Game(List<Client> clients, int nbPlayers) {
 		this.nbPlayers = nbPlayers;
@@ -21,16 +24,34 @@ public abstract class Game extends Thread {
 	@Override
 	public void run() {
 		init();
-		loop();
+		do {
+			emergencyExit(actual); // Test de deco.
+			loop();
+			nextTurn();
+			actual = clients.get(turn);
+		} while (!hasEnd());
 		end();
 	}
 
 	protected void init() {
+		sendAll("S");
+		actual = clients.get(turn);
 	}
 
 	abstract protected void loop();
 
 	protected void end() {
+		if (winner != 0) {
+			clients.get(winner).getCommunicationHandler().send("GG");
+			sendAllOthers("L", clients.get(winner));
+		} else {
+			if (hasWin()) {
+				actual.getCommunicationHandler().send("L");
+				sendAllOthers("GG", actual);
+			} else {
+				sendAll("E");
+			}
+		}
 		while (!clients.isEmpty()) {
 			Client client = clients.get(0);
 			client.clearGameState();
@@ -52,9 +73,9 @@ public abstract class Game extends Thread {
 	protected String waitforbuffer(Client c) {
 		try {
 			synchronized (c) {
-				System.out.println("Wait");
+				// System.out.println("Wait");
 				c.wait();
-				System.out.println("Waitplus");
+				// System.out.println("Waitplus");
 			}
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
@@ -99,4 +120,12 @@ public abstract class Game extends Thread {
 	public int getNbPlayer() {
 		return 0;
 	}
+
+	protected boolean hasEnd() {
+		return hasWin() || isFull();
+	}
+
+	abstract protected boolean hasWin();
+
+	abstract protected boolean isFull();
 }
