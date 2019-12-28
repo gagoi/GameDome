@@ -23,13 +23,6 @@ public class Morpion extends Game {
 		sendAll(str.toString());
 	}
 
-	private int readPlacement(String input) {
-		try {
-			return Integer.parseInt(input.substring(1));
-		} catch (StringIndexOutOfBoundsException | NumberFormatException e) {
-			return -1;
-		}
-	}
 
 	private boolean isPlacementAvailable(int c) {
 		return grid[c / 3][c % 3] == ' ';
@@ -57,19 +50,6 @@ public class Morpion extends Game {
 		boolean d2 = grid[0][2] == grid[1][1] && grid[1][1] == grid[2][0] && grid[0][2] == token;
 
 		return l1 || l2 || l3 || c1 || c2 || c3 || d1 || d2;
-	}
-
-	public String waitforbuffer(Client c) {
-		try {
-			synchronized (c) {
-				c.wait();
-			}
-		} catch (InterruptedException e1) {
-			e1.printStackTrace();
-		}
-		String str = c.getBuffer();
-		c.clearBuffer();
-		return str;
 	}
 
 	static public int getNbPlayers() {

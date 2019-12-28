@@ -48,10 +48,24 @@ public abstract class Game extends Thread {
 	protected void nextTurn() {
 		turn = (turn + 1) % nbPlayers;
 	}
-	
+
+	protected String waitforbuffer(Client c) {
+		try {
+			synchronized (c) {
+				System.out.println("Wait");
+				c.wait();
+				System.out.println("Waitplus");
+			}
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
+		String str = c.getBuffer();
+		c.clearBuffer();
+		return str;
+	}
+
 	protected void emergencyExit(Client actual) {
-		if (!actual.isAlive())
-		{
+		if (!actual.isAlive()) {
 			clients.remove(actual);
 			sendAll("GG");
 			return;
@@ -63,5 +77,26 @@ public abstract class Game extends Thread {
 			c.getCommunicationHandler().write(str.toString());
 			c.getCommunicationHandler().flush();
 		});
+	}
+
+	protected void sendAllOthers(String str, Client client) {
+		clients.forEach((c) -> {
+			if (c != client) {
+				c.getCommunicationHandler().write(str.toString());
+				c.getCommunicationHandler().flush();
+			}
+		});
+	}
+
+	protected int readPlacement(String input) {
+		try {
+			return Integer.parseInt(input.substring(1));
+		} catch (StringIndexOutOfBoundsException | NumberFormatException | NullPointerException e) {
+			return -1;
+		}
+	}
+
+	public int getNbPlayer() {
+		return 0;
 	}
 }

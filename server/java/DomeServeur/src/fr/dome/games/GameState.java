@@ -1,7 +1,7 @@
 package fr.dome.games;
 
 public enum GameState {
-	LOBBY(null, "Lobby"), MORPION(Morpion.class, "Morpion");
+	LOBBY(null, "Lobby"), MORPION(Morpion.class, "Morpion"), PUISSANCE(Puissance4.class, "Puissance");
 	
 	private Class<? extends Game> gameClass;
 	private String startCode;

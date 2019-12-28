@@ -22,10 +22,11 @@ public class ClientCommunicationHandler {
 	public String read() {
 		try {
 			String str = in.readLine();
-			//System.out.println("Recu : " + str.length() + " : " + str);
+			System.out.println("Recu : " + str.length() + " : " + str);
 			return str;
 		} catch (IOException e) {
 			e.printStackTrace();
+			Thread.currentThread().stop();
 		}
 		return "";
 	}

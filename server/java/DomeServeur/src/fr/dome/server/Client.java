@@ -52,11 +52,13 @@ public class Client extends Thread {
 						}
 					}
 					break;
+				case PUISSANCE:
 				case MORPION:
 					if (str.startsWith("P")) {
 						synchronized (this) {
+							System.out.println(str);
 							buffer = str;
-							notify();
+							notifyAll();
 						}
 					}
 					break;
