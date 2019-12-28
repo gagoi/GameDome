@@ -64,7 +64,13 @@ public class Battleship extends Game {
 				
 				nextTurn();
 				actual = clients.get(turn);
+				other = clients.get((turn + 1) % 2);
 				if (boat.isSunk()) {
+					if (hasWin()) {
+						winner = turn;
+						nextTurn();
+						return;
+					}
 					actual.getCommunicationHandler().send("BC" + boat.getStart().x + "/" + boat.getStart().y + "/" + boat.getEnd().x + "/" + boat.getEnd().y);
 					other.getCommunicationHandler().send("PC" + boat.getStart().x + "/" + boat.getStart().y + "/" + boat.getEnd().x + "/" + boat.getEnd().y);
 				} else {
@@ -88,7 +94,7 @@ public class Battleship extends Game {
 
 	@Override
 	protected boolean hasWin() {
-		return boats.get((turn + 1) % 2).stream().allMatch((b) -> b.isSunk());
+		return boats.get(turn).stream().allMatch((b) -> b.isSunk());
 	}
 
 	@Override
