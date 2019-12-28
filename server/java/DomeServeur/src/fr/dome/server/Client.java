@@ -16,12 +16,12 @@ public class Client extends Thread {
 	private String buffer = new String();
 
 	public Client(Socket socket) {
+		this.id = ++ids;
 		try {
-			this.communication = new ClientCommunicationHandler(socket.getInputStream(), socket.getOutputStream());
+			this.communication = new ClientCommunicationHandler(id, socket.getInputStream(), socket.getOutputStream());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		this.id = ++ids;
 		System.out.println("Client " + id + " connected.");
 	}
 
@@ -40,6 +40,7 @@ public class Client extends Thread {
 				case LOBBY:
 					if (str.startsWith("NC")) {
 						pseudo = str.substring(2);
+						getCommunicationHandler().setPseudo(pseudo);
 						// System.out.println("Client " + id + " logged as " + pseudo);
 					} else if (str.startsWith("\n")) {
 						preStop();
@@ -56,7 +57,15 @@ public class Client extends Thread {
 				case MORPION:
 					if (str.startsWith("P")) {
 						synchronized (this) {
-							System.out.println(str);
+							//System.out.println(str);
+							buffer = str;
+							notifyAll();
+						}
+					}
+					break;
+				case BATTLESHIP:
+					if (str.startsWith("P") || str.startsWith("B")) {
+						synchronized (this) {
 							buffer = str;
 							notifyAll();
 						}

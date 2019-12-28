@@ -6,55 +6,45 @@ import fr.dome.server.Client;
 
 public class Puissance4 extends Game {
 
-	int[][] grid = new int[6][7];
+	private int[][] grid = new int[6][7];
+	private int lastP, lastY;
 
 	public Puissance4(List<Client> clients) {
 		super(clients, 2);
 	}
 
 	@Override
-	protected void loop() {
-		boolean hasWin, isFull;
-		sendAll("S");
+	protected void init() {
+		super.init();
+
 		System.out.println("Start Puissance 4");
-		Client actual = clients.get(turn);
 		actual.getCommunicationHandler().send("T-1");
-		do {
-			emergencyExit(actual); // Test de deco.
+	}
+
+	@Override
+	protected void loop() {
+		int pos = readPlacement(waitforbuffer(actual));
+
+		if (pos == 9 || pos == -1) {
+			actual.getCommunicationHandler().send("L");
+			clients.remove(actual);
+			sendAll("GG");
+			return;
+		} else {
+			sendAllOthers("T" + pos, actual);
+
+			int y;
+			for (y = 0; y < 6 && grid[y][pos] != 0; ++y)
+				;
+			grid[y][pos] = turn + 1;
+
+			lastP = pos;
+			lastY = y;
 			
-			int pos = readPlacement(waitforbuffer(actual));
-
-			if (pos == 9 || pos == -1) {
-				actual.getCommunicationHandler().send("L");
-				clients.remove(actual);
-				sendAll("GG");
-				return;
-			} else {
-				sendAllOthers("T" + pos, actual);
-
-				int y;
-				for (y = 0; y < 6 && grid[y][pos] != 0; ++y)
-					;
-				grid[y][pos] = turn + 1;
-
-				hasWin = hasWin(turn, pos, y, grid);
-				isFull = isFull(grid);
-				nextTurn();
-				actual = clients.get(turn);
-				if (!hasWin) actual.getCommunicationHandler().send("C1");
-				else actual.getCommunicationHandler().send("C0");
-			}
-		} while (!hasWin && !isFull);
-
-		nextTurn();
-		actual = clients.get(turn);
-		
-		if(hasWin) { // Arrêt par victoire
-			nextTurn();
-			actual.getCommunicationHandler().send("GG");
-			clients.get(turn).getCommunicationHandler().send("L");
-		} else { // Arrêt par égalité
-			sendAll("E");
+			if (!hasWin())
+				sendAllOthers("C1", actual);
+			else
+				sendAllOthers("C0", actual);
 		}
 	}
 
@@ -65,6 +55,10 @@ public class Puissance4 extends Game {
 
 	static public int getNbPlayers() {
 		return 2;
+	}
+
+	protected boolean hasWin() {
+		return hasWin((turn + 1) % 2, lastP, lastY, grid);
 	}
 
 	private static boolean hasWin(int turn, int p, int y, int[][] grid) {
@@ -78,7 +72,6 @@ public class Puissance4 extends Game {
 			cpt++;
 		for (int i = p - 1; i >= Math.max(p - 4, 0) && grid[y][i] == turn + 1; --i)
 			cpt++;
-		System.out.println("Horizontal : " + cpt);
 		return cpt >= 4;
 	}
 
@@ -110,10 +103,11 @@ public class Puissance4 extends Game {
 			cpt++;
 		return cpt >= 4;
 	}
-	
-	private static boolean isFull(int[][] grid) {
-		for(int j = 0; j < 7; ++j)
-			if (grid[6][j] == 0) return false;
+
+	protected boolean isFull() {
+		for (int j = 0; j < 7; ++j)
+			if (grid[5][j] == 0)
+				return false;
 		return true;
 	}
 

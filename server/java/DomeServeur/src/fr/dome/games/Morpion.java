@@ -23,12 +23,12 @@ public class Morpion extends Game {
 		sendAll(str.toString());
 	}
 
-
 	private boolean isPlacementAvailable(int c) {
 		return grid[c / 3][c % 3] == ' ';
 	}
 
-	private boolean isFull() {
+	@Override
+	protected boolean isFull() {
 		boolean full = true;
 
 		for (int i = 0; i < 3; ++i)
@@ -57,41 +57,36 @@ public class Morpion extends Game {
 	}
 
 	@Override
-	protected void loop() {
+	protected void init() {
+		super.init();
 		sendAll("S");
-		System.out.println("Start");
-		Client actual;
-		do {
-			actual = clients.get(turn);
-			actual.getCommunicationHandler().write("T");
-			draw();
-			
+		System.out.println("Start Morpion");
+	}
 
-			emergencyExit(actual); // Test de deco.
-			int pos = readPlacement(waitforbuffer(actual));
-			
-			if (pos == 9 || pos == -1) {
-				actual.getCommunicationHandler().send("L");
-				clients.remove(actual);
-				sendAll("GG");
-				return;
-			}
-
-			if (isPlacementAvailable(pos)) {
-				grid[pos / 3][pos % 3] = TOKENS[turn];
-			} else {
-				continue;
-			}
-
-			hasWin = checkWin(TOKENS[turn]) || isFull();
-			nextTurn();
-		} while (!hasWin);
+	@Override
+	protected void loop() {
+		actual.getCommunicationHandler().write("T");
 		draw();
-		if (checkWin(TOKENS[turn]) || checkWin(TOKENS[(turn + 1) % 2])) {
-			actual.getCommunicationHandler().send("GG");
-			clients.get(turn).getCommunicationHandler().send("L");
-		} else {
-			sendAll("E");
+
+		int pos = readPlacement(waitforbuffer(actual));
+
+		if (pos == 9 || pos == -1) {
+			actual.getCommunicationHandler().send("L");
+			clients.remove(actual);
+			sendAll("GG");
+			return;
 		}
+
+		if (isPlacementAvailable(pos)) {
+			grid[pos / 3][pos % 3] = TOKENS[turn];
+		} else {
+			nextTurn(); // On fait un nextTurn en plus comme ca on revient sur le meme joueur et il
+						// rejoue ce bolosse.
+		}
+	}
+
+	@Override
+	protected boolean hasWin() {
+		return checkWin(TOKENS[(turn + 1) % 2]);
 	}
 }
