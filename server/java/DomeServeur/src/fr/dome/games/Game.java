@@ -41,7 +41,9 @@ public abstract class Game extends Thread {
 	abstract protected void loop();
 
 	protected void end() {
-		if (winner != 0) {
+		if (winner == -1) {
+			sendAll("E");
+		} else if (winner != 0) {
 			clients.get(winner).getCommunicationHandler().send("GG");
 			sendAllOthers("L", clients.get(winner));
 		} else {
