@@ -241,7 +241,8 @@ class tron():
             addtext(stdscr, 3,3,str(key))
             if key == curses.KEY_UP and self.actual[0] > 0 and [self.actual[0]-1,self.actual[1]] not in self.mywall and [self.actual[0]-1,self.actual[1]] not in self.advwall:
                 for p in poss:
-                    self.colorCase(p, 0)
+                    if p[0] >= 0 and p[1] >= 0 and p[0] <= self.nbligne - 1 and p[1] <= self.nbcolone - 1:
+                        self.colorCase(p, 0)
                 self.colorCase(self.actual,self.colormywall)
                 self.colorCase(poss[0], self.colorme)
 
@@ -250,32 +251,35 @@ class tron():
 
             elif key == curses.KEY_DOWN and self.actual[0] < self.nbligne - 1 and [self.actual[0]+1,self.actual[1]] not in self.mywall and [self.actual[0]+1,self.actual[1]] not in self.advwall:
                 for p in poss:
-                    self.colorCase(p, 0)
+                    if p[0] >= 0 and p[1] >= 0 and p[0] <= self.nbligne - 1 and p[1] <= self.nbcolone -1:
+                        self.colorCase(p, 0)
                 self.colorCase(self.actual,self.colormywall)
                 self.colorCase(poss[1], self.colorme)
-
                 self.color()
                 tmp = poss[1]
 
             elif key == curses.KEY_RIGHT and self.actual[1] < self.nbcolone - 1 and [self.actual[0],self.actual[1]+1] not in self.mywall and [self.actual[0],self.actual[1]+1] not in self.advwall:
                 for p in poss:
-                    self.colorCase(p, 0)
+                    if p[0] >= 0 and p[1] >= 0 and p[0] <= self.nbligne - 1 and p[1] <= self.nbcolone - 1:
+                        self.colorCase(p, 0)
                 self.colorCase(self.actual,self.colormywall)
                 self.colorCase(poss[2], self.colorme)
                 self.color()
                 tmp = poss[2]
-            elif key == curses.KEY_LEFT and self.actual[0] > 0 and [self.actual[0],self.actual[1]-1] not in self.mywall and [self.actual[0],self.actual[1]-1] not in self.advwall:
+            elif key == curses.KEY_LEFT and self.actual[1] > 0 and [self.actual[0],self.actual[1]-1] not in self.mywall and [self.actual[0],self.actual[1]-1] not in self.advwall:
                 for p in poss:
-                    self.colorCase(p, 0)
+                    if p[0] >= 0 and p[1] >= 0 and p[0] <= self.nbligne - 1 and p[1] <= self.nbcolone - 1:
+                        self.colorCase(p, 0)
                 self.colorCase(self.actual,self.colormywall)
 
                 self.colorCase(poss[3], self.colorme)
                 self.color()
                 tmp = poss[3]
-            elif key ==113:
+
+            elif key == curses.KEY_BACKSPACE:
                 envoi(self.s, "P" + str(-1) + "/" + str(-1) + "\n")
 
-            elif key == 32 or key == 77:
+            elif key == 32 or key == 77 or key == curses.KEY_ENTER or key == 10:
                 if tmp != []:
                     wait(self.s, 'NOW')
                     addtext(stdscr,3,4,"IF")
@@ -399,7 +403,7 @@ class bataillenavale():
                 self.colorTab2()
                 self.colorCase2(actual, 6)
 
-            elif key == 77 or key == 32:
+            elif key == 77 or key == 32 or key == curses.KEY_ENTER or key == 10:
                 if actual not in self.penv:
                     self.colorCase2(actual, 1)
                     self.penv.append(actual)
@@ -559,7 +563,6 @@ class bataillenavale():
 
                 key = stdscr.getch()
 
-
                 if key == curses.KEY_UP and actual[0] > 0:
                     self.colorCase(actual,0)
                     self.colorend(actual,end,horizon,0)
@@ -603,7 +606,7 @@ class bataillenavale():
                     else:
                         horizon = not horizon
 
-                elif key == 77:
+                elif key == 77 or key == curses.KEY_ENTER or key == 10:
                     b= self.verif(actual, end, horizon)
                     if b:
                         self.addBoat(actual, end, horizon)
