@@ -732,8 +732,27 @@ class puissanceq():
                 return 0
             else:
                 if "T" in r1:
-                    nadv = int(r1.split('T')[1])
-                    if nadv != -1:
+                    if "C1" in r1:
+                        if endofGame(stdscr, r1, self.y + self.hauteur // 2, self.x + self.largeur // 2) == 0:
+                            return 0
+                        rtr1 =r1.split("C1")
+                        nadv = int(rtr1[0].split('T')[1])
+                        self.colorCase(self.coloneMax[nadv], nadv, True)
+                        self.coloneMax[nadv] -= 1
+                        rtr =1
+
+                    elif "C0" in r1:
+                        if endofGame(stdscr,r1, self.y+self.hauteur//2,self.x+self.largeur//2)==0:
+                            return 0
+                        rtr1 = r1.split("C0")
+                        nadv = int(rtr1[0].split('T')[1])
+                        self.colorCase(self.coloneMax[nadv], nadv, True)
+                        self.coloneMax[nadv] -= 1
+                        rtr = 0
+
+
+                    elif nadv != -1:
+                        nadv = int(r1.split('T')[1])
                         self.colorCase(self.coloneMax[nadv], nadv, True)
                         self.coloneMax[nadv] -= 1
                         rtr = wait(self.s,'C')
