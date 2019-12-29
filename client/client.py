@@ -750,17 +750,18 @@ class puissanceq():
                         self.coloneMax[nadv] -= 1
                         rtr = 0
 
-
-                    elif nadv != -1:
-                        nadv = int(r1.split('T')[1])
-                        self.colorCase(self.coloneMax[nadv], nadv, True)
-                        self.coloneMax[nadv] -= 1
-                        rtr = wait(self.s,'C')
-                        if endofGame(stdscr,rtr, self.y+self.hauteur//2,self.x+self.largeur//2)==0:
-                            return 0
-                        rtr = int(rtr.split('C')[1])
                     else:
-                        rtr =1
+                        nadv = int(r1.split('T')[1])
+                        if nadv != -1:
+                            nadv = int(r1.split('T')[1])
+                            self.colorCase(self.coloneMax[nadv], nadv, True)
+                            self.coloneMax[nadv] -= 1
+                            rtr = wait(self.s,'C')
+                            if endofGame(stdscr,rtr, self.y+self.hauteur//2,self.x+self.largeur//2)==0:
+                                return 0
+                            rtr = int(rtr.split('C')[1])
+                        else:
+                            rtr =1
 
                     if rtr == 1:
 
