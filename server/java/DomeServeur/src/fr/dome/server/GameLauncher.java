@@ -4,8 +4,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
 
+import fr.dome.games.Game;
 import fr.dome.games.GameState;
 
 public class GameLauncher extends Thread {
@@ -16,6 +16,7 @@ public class GameLauncher extends Thread {
 
 	public GameLauncher(List<Client> clients) {
 		this.clients = clients;
+		.
 		for (GameState g : GameState.values())
 			if (g != GameState.LOBBY)
 			games_list.put(g, new GamePendingList());
@@ -56,6 +57,7 @@ public class GameLauncher extends Thread {
 	class GameLobby extends ArrayList<Client> {
 
 		private GameState s;
+		private Game gameInstance;
 		
 		public GameLobby(GameState s) {
 			super(2);
