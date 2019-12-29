@@ -6,8 +6,8 @@ import curses
 import time as t
 import os
 
-autoc = True
-anim = False
+autoc = False
+anim = True
 MAX = 40
 import os
 
@@ -355,7 +355,7 @@ class bataillenavale():
 
             stdscr.clear()
             addtext(stdscr, self.y - 3, self.x + self.largeur // 2, ">> YOUR BOATS <<", True, curses.color_pair(4))
-            addtext(stdscr, self.y - 3, self.marge[1] + self.x + self.largeur // 2, ">> ADV BOATS <<", True,
+            addtext(stdscr, self.y - 3, self.marge[1] + self.x + self.largeur // 2, ">> OPP BOATS <<", True,
                     curses.color_pair(2))
             self.affGr()
             self.affHGr()
@@ -372,6 +372,10 @@ class bataillenavale():
                 self.colorCase2(self.penv[k], 2)
 
     def shoot(self):
+        addtext(stdscr, self.y - 5, self.middle, ">                          <", True, 3)
+
+        addtext(stdscr, self.y - 5, self.middle, "> YOUR TURN TO PLAY <", True, 4)
+
         self.colorTab2()
         actual = [5, 5]
 
@@ -408,6 +412,9 @@ class bataillenavale():
                     self.colorCase2(actual, 1)
                     self.penv.append(actual)
                     self.penvstate.append(0)
+                    addtext(stdscr, self.y - 5, self.middle, ">                   <", True, 4)
+                    addtext(stdscr, self.y - 5, self.middle, "> YOUR OPPENENT IS PLAYING <", True, 4)
+
                     break
         return actual
     def jeu(self):
