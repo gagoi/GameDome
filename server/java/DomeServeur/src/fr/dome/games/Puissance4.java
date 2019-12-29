@@ -43,8 +43,10 @@ public class Puissance4 extends Game {
 			
 			if (!hasWin())
 				sendAllOthers("C1", actual);
-			else
+			else {
+				nextTurn();
 				sendAllOthers("C0", actual);
+			}
 		}
 	}
 
@@ -62,6 +64,7 @@ public class Puissance4 extends Game {
 	}
 
 	private static boolean hasWin(int turn, int p, int y, int[][] grid) {
+		System.out.println("Has Win : " + turn + " - " + p + " - " + y);
 		return hasWinHorizontal(turn, grid, p, y) || hasWinVertical(turn, grid, p, y) || hasWinD1(turn, grid, p, y)
 				|| hasWinD2(turn, grid, p, y);
 	}
@@ -72,6 +75,7 @@ public class Puissance4 extends Game {
 			cpt++;
 		for (int i = p - 1; i >= Math.max(p - 4, 0) && grid[y][i] == turn + 1; --i)
 			cpt++;
+		System.out.println("Horinzontal : " + cpt);
 		return cpt >= 4;
 	}
 
@@ -79,6 +83,7 @@ public class Puissance4 extends Game {
 		int cpt = 1;
 		for (int i = y - 1; i >= Math.max(y - 4, 0) && grid[i][p] == turn + 1; --i)
 			cpt++;
+		System.out.println("Vertical : " + cpt);
 		return cpt >= 4;
 	}
 
@@ -90,6 +95,7 @@ public class Puissance4 extends Game {
 		for (int i = p - 1, j = y - 1; i >= Math.max(p - 4, 0) && j >= Math.max(y - 4, 0)
 				&& grid[j][i] == turn + 1; --i, --j)
 			cpt++;
+		System.out.println("D1 : " + cpt);
 		return cpt >= 4;
 	}
 
@@ -101,6 +107,7 @@ public class Puissance4 extends Game {
 		for (int i = p - 1, j = y + 1; i >= Math.max(p - 4, 0) && j < Math.min(y + 4, 6)
 				&& grid[j][i] == turn + 1; --i, ++j)
 			cpt++;
+		System.out.println("D2 : " + cpt);
 		return cpt >= 4;
 	}
 
