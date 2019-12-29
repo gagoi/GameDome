@@ -926,7 +926,13 @@ def wait(s, c):
 
 def envoi(s, message, test=True):
     if test:
-        n = s.send(bytes(message, 'utf-8'))
+        try:
+            n = s.send(bytes(message, 'utf-8'))
+        except:
+            try:
+                n = s.send(message)
+            except:
+                return 0
     else:
         n = s.send(message)
     if (n != len(message)):
