@@ -3,51 +3,76 @@ package fr.dome.server;
 import java.io.IOException;
 import java.net.Socket;
 
+import fr.dome.games.GameState;
+
 public class Client extends Thread {
+
 	private static int ids = 0; // Nombre de clients qui se sont connectés au serveur.
 
 	private final int id; // Id du client.
 	private ClientCommunicationHandler communication;
 	private String pseudo = null;
-	volatile private String buffer = null;
+	private GameState state = GameState.LOBBY;
+	private String buffer = new String();
 
 	public Client(Socket socket) {
+		this.id = ++ids;
 		try {
-			this.communication = new ClientCommunicationHandler(socket.getInputStream(), socket.getOutputStream());
+			this.communication = new ClientCommunicationHandler(id, socket.getInputStream(), socket.getOutputStream());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		this.id = ++ids;
 		System.out.println("Client " + id + " connected.");
 	}
 
 	public void preStop() {
+		Lobby.getInstance().disconnect(this);
 		System.out.println("Client " + id + " disconnected");
 	}
 
-	/*
-	 * public String read() { String str = ""; try { str = read(in); } catch
-	 * (IOException e) { e.printStackTrace(); preStop(); } if (str.equals("")) {
-	 * System.out.println("Client " + id + " disconnected"); } else
-	 * System.out.println(id + " : " + str); return str; }
-	 * 
-	 */
 	@Override
 	public void run() {
 		while (true) {
 			try {
 				String str = getCommunicationHandler().read();
-				if (str.startsWith("NC")) {
-					pseudo = str.substring(2);
-					System.out.println("Client " + id + " logged as " + pseudo);
-				} else if (str.startsWith("\n")) {
-					preStop();
-					return;
-				} else if (str.startsWith("P")) {
-					buffer = str;
-				} else if (str.startsWith("C")) {// Chat
-				} else {
-					communication.send("Back : " + str);
+
+				switch (state) {
+				case LOBBY:
+					if (str.startsWith("NC")) {
+						pseudo = str.substring(2);
+						getCommunicationHandler().setPseudo(pseudo);
+						// System.out.println("Client " + id + " logged as " + pseudo);
+					} else if (str.startsWith("\n")) {
+						preStop();
+						return;
+					} else {
+						for (GameState g : GameState.values()) {
+							if (g != GameState.LOBBY)
+								if (str.startsWith(g.getCode()))
+									state = g;
+						}
+					}
+					break;
+				case PUISSANCE:
+				case TRON:
+				case MORPION:
+					if (str.startsWith("P")) {
+						synchronized (this) {
+							//System.out.println(str);
+							buffer = str;
+							notifyAll();
+						}
+					}
+					break;
+				case BATTLESHIP:
+					if (str.startsWith("P") || str.startsWith("B")) {
+						synchronized (this) {
+							buffer = str;
+							notifyAll();
+						}
+					}
+					break;
+
 				}
 			} catch (NullPointerException e) {
 				preStop();
@@ -70,5 +95,21 @@ public class Client extends Thread {
 
 	public void clearBuffer() {
 		buffer = null;
+	}
+
+	public GameState getGameState() {
+		return state;
+	}
+
+	public void clearGameState() {
+		state = GameState.LOBBY;
+	}
+
+	public String getPseudo() {
+		return pseudo;
+	}
+
+	public int getClientId() {
+		return id;
 	}
 }
