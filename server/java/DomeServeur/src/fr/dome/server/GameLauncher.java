@@ -57,7 +57,6 @@ public class GameLauncher extends Thread {
 	class GameLobby extends ArrayList<Client> {
 
 		private GameState s;
-		private Game gameInstance;
 		
 		public GameLobby(GameState s) {
 			super(2);
