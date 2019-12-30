@@ -21,10 +21,6 @@ public class Tron extends Game {
 	}
 
 	@Override
-	protected void draw() {
-	}
-
-	@Override
 	protected boolean hasWin() {
 		return false;
 	}

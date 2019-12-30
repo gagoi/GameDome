@@ -4,13 +4,13 @@ import java.util.List;
 
 import fr.dome.server.Client;
 
-public class Puissance4 extends Game {
+public class Puissance4 extends Game2Players {
 
 	private int[][] grid = new int[6][7];
 	private int lastP, lastY;
 
 	public Puissance4(List<Client> clients) {
-		super(clients, 2);
+		super(clients);
 	}
 
 	@Override
@@ -27,11 +27,10 @@ public class Puissance4 extends Game {
 
 		if (pos == 9 || pos == -1) {
 			actual.getCommunicationHandler().send("L");
-			clients.remove(actual);
-			sendAll("GG");
+			other.getCommunicationHandler().send("GG");
 			return;
 		} else {
-			sendAllOthers("T" + pos, actual);
+			other.getCommunicationHandler().send("T" + pos);
 
 			int y;
 			for (y = 0; y < 6 && grid[y][pos] != 0; ++y)
@@ -44,15 +43,9 @@ public class Puissance4 extends Game {
 			if (!hasWin())
 				sendAllOthers("C1", actual);
 			else {
-				nextTurn();
 				sendAllOthers("C0", actual);
 			}
 		}
-	}
-
-	@Override
-	protected void draw() {
-
 	}
 
 	static public int getNbPlayers() {
@@ -60,7 +53,7 @@ public class Puissance4 extends Game {
 	}
 
 	protected boolean hasWin() {
-		return hasWin((turn + 1) % 2, lastP, lastY, grid);
+		return hasWin(turn, lastP, lastY, grid);
 	}
 
 	private static boolean hasWin(int turn, int p, int y, int[][] grid) {

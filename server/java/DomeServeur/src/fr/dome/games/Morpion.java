@@ -4,13 +4,13 @@ import java.util.List;
 
 import fr.dome.server.Client;
 
-public class Morpion extends Game {
+public class Morpion extends Game2Players {
 
 	private static final char[] TOKENS = { 'X', 'O' };
 	private char grid[][] = { { ' ', ' ', ' ' }, { ' ', ' ', ' ' }, { ' ', ' ', ' ' } };
 
 	public Morpion(List<Client> clients) {
-		super(clients, 2);
+		super(clients);
 	}
 
 	protected void draw() {
@@ -59,7 +59,6 @@ public class Morpion extends Game {
 	@Override
 	protected void init() {
 		super.init();
-		sendAll("S");
 		System.out.println("Start Morpion");
 	}
 
@@ -72,8 +71,7 @@ public class Morpion extends Game {
 
 		if (pos == 9 || pos == -1) {
 			actual.getCommunicationHandler().send("L");
-			clients.remove(actual);
-			sendAll("GG");
+			other.getCommunicationHandler().send("GG");
 			return;
 		}
 
@@ -87,6 +85,6 @@ public class Morpion extends Game {
 
 	@Override
 	protected boolean hasWin() {
-		return checkWin(TOKENS[(turn + 1) % 2]);
+		return checkWin(TOKENS[turn]);
 	}
 }

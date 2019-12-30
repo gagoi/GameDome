@@ -6,11 +6,11 @@ import java.util.List;
 
 import fr.dome.server.Client;
 
-public class Battleship extends Game {
+public class Battleship extends Game2Players {
 	ArrayList<ArrayList<Boat>> boats = new ArrayList<ArrayList<Boat>>(2);
 
 	public Battleship(List<Client> clients) {
-		super(clients, 2);
+		super(clients);
 	}
 
 	@Override
@@ -23,7 +23,15 @@ public class Battleship extends Game {
 		for (int k = 0; k < 2; ++k) {
 			System.out.println(k);
 			actual.getCommunicationHandler().send("NOW");
-			String str = waitforbuffer(actual).substring(1);
+			String str;
+			try {
+				str = waitforbuffer(actual).substring(1);
+			} catch (StringIndexOutOfBoundsException e) {
+				actual.getCommunicationHandler().send("L");
+				other.getCommunicationHandler().send("GG");
+				stop = true;
+				return;
+			}
 			String[] bs = str.split("#");
 			for (String s : bs) {
 				String[] positions = s.split("/");
@@ -39,10 +47,8 @@ public class Battleship extends Game {
 			}
 			System.out.println("Fini : " + k);
 			nextTurn();
-			actual = clients.get(turn);
 		}
 		nextTurn();
-		actual = clients.get(turn);
 		sendAll("SS");
 		actual.getCommunicationHandler().send("Kkkkkkk");
 	}
@@ -53,26 +59,24 @@ public class Battleship extends Game {
 		int x = Integer.parseInt(str[0]);
 		int y = Integer.parseInt(str[1]);
 
-		Client other = clients.get((turn + 1) % 2);
-
 		ArrayList<Boat> b = boats.get((turn + 1) % 2);
 
 		boolean hasTouch = false;
 		for (Boat boat : b) {
 			if (boat.isHitted(x, y)) {
 				hasTouch = true;
-				
+
 				nextTurn();
-				actual = clients.get(turn);
-				other = clients.get((turn + 1) % 2);
 				if (boat.isSunk()) {
 					if (hasWin()) {
-						winner = turn;
 						nextTurn();
+						winner = turn;
 						return;
 					}
-					actual.getCommunicationHandler().send("BC" + boat.getStart().x + "/" + boat.getStart().y + "/" + boat.getEnd().x + "/" + boat.getEnd().y);
-					other.getCommunicationHandler().send("PC" + boat.getStart().x + "/" + boat.getStart().y + "/" + boat.getEnd().x + "/" + boat.getEnd().y);
+					actual.getCommunicationHandler().send("BC" + boat.getStart().x + "/" + boat.getStart().y + "/"
+							+ boat.getEnd().x + "/" + boat.getEnd().y);
+					other.getCommunicationHandler().send("PC" + boat.getStart().x + "/" + boat.getStart().y + "/"
+							+ boat.getEnd().x + "/" + boat.getEnd().y);
 				} else {
 					actual.getCommunicationHandler().send("BT" + x + "/" + y);
 					other.getCommunicationHandler().send("PT" + x + "/" + y);
@@ -80,16 +84,12 @@ public class Battleship extends Game {
 				break;
 			}
 		}
-		
+
 		if (!hasTouch) {
 			actual.getCommunicationHandler().send("BR" + x + "/" + y);
 			other.getCommunicationHandler().send("PR" + x + "/" + y);
 		}
 
-	}
-
-	@Override
-	protected void draw() {
 	}
 
 	@Override
@@ -157,11 +157,11 @@ public class Battleship extends Game {
 		public Point getStart() {
 			return cases[0];
 		}
-		
+
 		public Point getEnd() {
 			return cases[cases.length - 1];
 		}
-		
+
 	}
 
 }

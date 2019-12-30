@@ -12,6 +12,8 @@ public abstract class Game extends Thread {
 	protected boolean hasWin = false;
 	protected String buffer = null;
 	protected int winner;
+	
+	protected boolean stop;
 
 	protected Client actual;
 
@@ -19,23 +21,24 @@ public abstract class Game extends Thread {
 		this.nbPlayers = nbPlayers;
 		this.clients = clients;
 		this.turn = (int) (Math.random() * nbPlayers);
+		actual = clients.get(turn); 
 	}
 
 	@Override
-	public void run() {
+	final public void run() {
 		init();
-		do {
+
+		nextTurn();
+		while (!hasEnd() && !stop) {
+			nextTurn();
 			emergencyExit(actual); // Test de deco.
 			loop();
-			nextTurn();
-			actual = clients.get(turn);
-		} while (!hasEnd());
+		}
 		end();
 	}
 
 	protected void init() {
 		sendAll("S");
-		actual = clients.get(turn);
 	}
 
 	abstract protected void loop();
@@ -46,8 +49,8 @@ public abstract class Game extends Thread {
 			sendAllOthers("L", clients.get(winner));
 		} else {
 			if (hasWin()) {
-				actual.getCommunicationHandler().send("L");
-				sendAllOthers("GG", actual);
+				actual.getCommunicationHandler().send("GG");
+				sendAllOthers("L", actual);
 			} else {
 				sendAll("E");
 			}
@@ -60,14 +63,13 @@ public abstract class Game extends Thread {
 		}
 	}
 
-	abstract protected void draw();
-
 	static public int getNbPlayers() {
 		return 0;
 	}
 
 	protected void nextTurn() {
 		turn = (turn + 1) % nbPlayers;
+		actual = clients.get(turn);
 	}
 
 	protected String waitforbuffer(Client c) {
@@ -113,12 +115,13 @@ public abstract class Game extends Thread {
 		try {
 			return Integer.parseInt(input.substring(1));
 		} catch (StringIndexOutOfBoundsException | NumberFormatException | NullPointerException e) {
+			stop = true;
 			return -1;
 		}
 	}
 
 	public int getNbPlayer() {
-		return 0;
+		throw new IllegalArgumentException("Wtf plz redefine this");
 	}
 
 	protected boolean hasEnd() {
