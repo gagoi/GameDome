@@ -5,13 +5,13 @@ import java.util.List;
 
 import fr.dome.server.Client;
 
-public class Tron extends Game {
+public class Tron extends Game2Players {
 
 	private static final int WIDTH = 15;
 	private static final int HEIGHT = 10;
 
 	public Tron(List<Client> clients) {
-		super(clients, 2);
+		super(clients);
 	}
 
 	@Override
@@ -22,8 +22,6 @@ public class Tron extends Game {
 
 	@Override
 	protected void loop() {
-
-		Client other = clients.get((turn + 1) % 2);
 		actual.getCommunicationHandler().send("NOW");
 		String tmp = waitforbuffer(actual);
 		System.out.println(tmp);
@@ -39,7 +37,7 @@ public class Tron extends Game {
 			if (p2.x == -1 && p2.y == -1)
 				winner = -1;
 			else
-				winner = (turn + 1) % 2;
+				winner = otherId;
 		} else if (p2.x == -1 && p2.y == -1) {
 			winner = turn;
 		} else {
@@ -51,11 +49,6 @@ public class Tron extends Game {
 	@Override
 	protected boolean hasWin() {
 		return winner != 0;
-	}
-
-	@Override
-	protected boolean isFull() {
-		return false;
 	}
 
 	public static int getNbPlayers() {

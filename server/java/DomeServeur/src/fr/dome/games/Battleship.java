@@ -97,11 +97,6 @@ public class Battleship extends Game2Players {
 		return boats.get(turn).stream().allMatch((b) -> b.isSunk());
 	}
 
-	@Override
-	protected boolean isFull() {
-		return false;
-	}
-
 	public static int getNbPlayers() {
 		return 2;
 	}
