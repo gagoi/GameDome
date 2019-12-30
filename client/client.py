@@ -157,6 +157,99 @@ def morpion(s, stdscr, ml, l, c):
 
         r(stdscr)
 
+class othello():
+    chargrilleLg = "-"
+    chargrilleCl = "|"
+    tligne = 3
+    tcolone = 6
+    nbcolone = 8
+    nbligne = nbcolone
+    help = True
+    mycolor = 4
+    myactualcolor = 1
+    oppcolor = 2
+    gr = [0 for k in range(nbligne * nbcolone -5)]
+    gr = [1,0,2] + gr + [2,0]
+    def __init__(self, s, l, c):
+        self.s, self.l, self.c  = s, l, c
+        self.largeur = self.nbcolone * (self.tcolone + 1)
+        self.hauteur = self.nbligne * (self.tligne + 1)
+        self.y = self.l // 2 - self.hauteur // 2
+        self.x = self.c // 2 - self.largeur // 2
+
+        self.affGr(self.gr)
+        self.affHGr()
+
+
+    def affGr(self, gr):
+        # add columns
+        for k in range(self.nbcolone + 1):
+            for i in range(self.tligne):
+                for j in range(self.nbligne):
+                    addtext(stdscr, 1 + self.y + i + j + j * self.tligne, self.x + self.tcolone * k + k,
+                            self.chargrilleCl)
+
+        # add rows
+        for k in range(self.nbligne + 1):
+            for i in range(self.tcolone):
+                for j in range(self.nbcolone):
+                    if self.x + 1 + i + j * self.tcolone % self.tcolone != 0:
+                        addtext(stdscr, self.y + self.tligne * k + k, self.x + 1 + +j + i + j * self.tcolone,
+                                self.chargrilleLg)
+
+        for k in range(self.nbcolone* self.nbligne):
+            y = k//self.nbligne
+            x = k%self.nbcolone
+            if gr[k] == 1: #ME
+                self.colorCase([y,x], self.mycolor)
+            elif gr[k] == 2:
+                self.colorCase([y,x], self.oppcolor)
+
+
+
+    def affHGr(self):
+        if self.help:
+            for k in range(self.nbcolone):
+                addtext(stdscr, self.y - 1, self.x + self.tcolone // 2 + k + k * self.tcolone, " ")
+            for k in range(self.nbligne):
+                addtext(stdscr, self.y + self.tligne // 2 + k + k * self.tligne + 1, self.x - 2, " ")
+
+        else:
+            for k in range(self.nbcolone):
+                addtext(stdscr, self.y - 1, self.x + self.tcolone // 2 + k + k * self.tcolone, str(k))
+
+            for k in range(self.nbligne):
+                addtext(stdscr, self.y + self.tligne // 2 + k + k * self.tligne+1, self.x -2, str(k))
+            # addtext(stdscr, self.y + self.tligne // 2 + k + k * self.tligne+1 , self.x -2 + self.marge[1], str(k))
+
+    def colorCase(self, L, colorn = 0):
+        y,x = L
+        for j in range(self.tligne):
+            for k in range(self.tcolone):
+                i = self.tligne - 1 - j
+                addtext(stdscr, self.y + 1 + i + (self.tligne + 1) * y, self.x + 1 + k + (self.tcolone + 1) * x, " ",
+                        color=curses.color_pair(colorn))
+
+    def play(self):
+        #-1 => help
+        #-2 => quit
+
+        addtext(stdscr, self.y + self.hauteur + 3, self.x + self.largeur // 2, "> HELP <", True)
+        addtext(stdscr, self.y + self.hauteur + 5, self.x + self.largeur // 2, "> GIVE UP & QUIT <", True)
+        tmp = [self.nbligne//2, self.nbcolone//2]
+        self.affGr()
+        self.colorCase(tmp,self.grColor)
+
+        while 1:
+
+            key = stdscr.getch()
+
+            if key == curses.KEY_UP and tmp[0]>0:
+                pass
+            elif key == curses.KEY_DOWN and key != -2:
+                pass
+
+
 class tron():
 
     chargrilleLg = "-"
@@ -180,7 +273,7 @@ class tron():
         self.largeur = self.nbcolone * (self.tcolone + 1)
         self.hauteur = self.nbligne * (self.tligne + 1)
         self.y = self.l // 2 - self.hauteur // 2
-        self.x = self.dc
+        self.x = self.c // 2 - self.largeur // 2
         # self.actual[0] = self.nbligne - 2
         # self.actual[1] =  1
         self.affGr()
@@ -243,38 +336,40 @@ class tron():
                 for p in poss:
                     if p[0] >= 0 and p[1] >= 0 and p[0] <= self.nbligne - 1 and p[1] <= self.nbcolone - 1:
                         self.colorCase(p, 0)
-                self.colorCase(self.actual,self.colormywall)
                 self.colorCase(poss[0], self.colorme)
 
                 self.color()
+
+                self.colorCase(self.actual,self.colormywall)
                 tmp = poss[0]
 
             elif key == curses.KEY_DOWN and self.actual[0] < self.nbligne - 1 and [self.actual[0]+1,self.actual[1]] not in self.mywall and [self.actual[0]+1,self.actual[1]] not in self.advwall:
                 for p in poss:
                     if p[0] >= 0 and p[1] >= 0 and p[0] <= self.nbligne - 1 and p[1] <= self.nbcolone -1:
                         self.colorCase(p, 0)
-                self.colorCase(self.actual,self.colormywall)
                 self.colorCase(poss[1], self.colorme)
                 self.color()
                 tmp = poss[1]
+                self.colorCase(self.actual,self.colormywall)
 
             elif key == curses.KEY_RIGHT and self.actual[1] < self.nbcolone - 1 and [self.actual[0],self.actual[1]+1] not in self.mywall and [self.actual[0],self.actual[1]+1] not in self.advwall:
                 for p in poss:
                     if p[0] >= 0 and p[1] >= 0 and p[0] <= self.nbligne - 1 and p[1] <= self.nbcolone - 1:
                         self.colorCase(p, 0)
-                self.colorCase(self.actual,self.colormywall)
                 self.colorCase(poss[2], self.colorme)
                 self.color()
+
+                self.colorCase(self.actual,self.colormywall)
                 tmp = poss[2]
             elif key == curses.KEY_LEFT and self.actual[1] > 0 and [self.actual[0],self.actual[1]-1] not in self.mywall and [self.actual[0],self.actual[1]-1] not in self.advwall:
                 for p in poss:
                     if p[0] >= 0 and p[1] >= 0 and p[0] <= self.nbligne - 1 and p[1] <= self.nbcolone - 1:
                         self.colorCase(p, 0)
-                self.colorCase(self.actual,self.colormywall)
 
                 self.colorCase(poss[3], self.colorme)
                 self.color()
                 tmp = poss[3]
+                self.colorCase(self.actual,self.colormywall)
 
             elif key == curses.KEY_BACKSPACE:
                 envoi(self.s, "P" + str(-1) + "/" + str(-1) + "\n")
@@ -342,7 +437,9 @@ class bataillenavale():
         self.y = self.l // 2 - self.hauteur // 2
         self.x = self.dc
         self.marge =[0, self.dc*3 + self.largeur]
-        self.middle = self.x+self.largeur+int(self.dc*1.5)
+
+        self.x = self.c //2 - (self.marge[1]+self.largeur)//2
+        self.middle = self.x + self.largeur + int(self.dc * 1.5)
         # addtext(stdscr, 3, 3, str(self.x) + " " + str(self.c))
 
         if self.l > self.hauteur + 4 and self.c > self.largeur:
@@ -707,6 +804,7 @@ class puissanceq():
     help = False
     colorn = 2
     colornadv = 3
+    grColor = 5
 
     def __init__(self, s, l, c, dc):
         self.s, self.l, self.c, self.dc = s, l, c, dc
@@ -714,7 +812,7 @@ class puissanceq():
         self.hauteur = self.nbligne * (self.tligne + 1)
 
         self.y = self.l // 2 - self.hauteur // 2 - 2
-        self.x = self.dc
+        self.x = self.c // 2 - self.largeur // 2
         self.coloneMax = [self.nbligne for k in range(self.nbcolone)]
 
         if self.l > self.hauteur + 4 and self.c > self.largeur:
@@ -723,11 +821,14 @@ class puissanceq():
             # r(stdscr)
             self.affGr()
             self.affHGr()
+            # self.choice()
             self.jeu()
 
     def jeu(self):
-        while (1):
-            r1 = self.s.recv(MAX).decode("utf-8")
+        L = ["T-1", "T2C1","T4C1","T0C1","T5C1",]
+        for r1 in L:
+        # while (1):
+            # r1 = self.s.recv(MAX).decode("utf-8")
             if endofGame(stdscr,r1,self.y+self.hauteur//2,self.x+self.largeur//2) == 0:
                 return 0
             else:
@@ -764,40 +865,103 @@ class puissanceq():
                             rtr =1
 
                     if rtr == 1:
-
-                        addtext(stdscr, self.y + self.hauteur + 2, self.x + self.tcolone, "> Enter the columns to play: ")
-                        addtext(stdscr, self.y + self.hauteur + 3, self.x + self.tcolone, ">")
-
                         # n = gettxt(stdscr, self.y + self.hauteur + 3, self.x + self.tcolone + 1, 2)
                         while(1):
-                            n = gettxt(stdscr, self.y + self.hauteur + 3, self.x + self.tcolone + 1, 2)
-                            if n == "h" or n == "H":
-                                self.affHGr()
-                                addtext(stdscr, self.y + self.hauteur + 3, self.x + self.tcolone+1, "   ")
-
                             # help page
-                            elif "q" in n:
-                                envoi(self.s,"C9\n")
+                            n = int(self.choice())
+                            if n == 9:
+                                # envoi(self.s,"C9\n")
+                                addtext(stdscr,3,3,str(n))
                                 break
-                            elif n.isdigit():
-                                addtext(stdscr, self.y + self.hauteur + 3, self.x + self.tcolone, ">  ")
-                                n = int(n)
+                            else:
                                 if n < self.nbcolone:
                                     if self.coloneMax[n] != 0:
                                         self.colorCase(self.coloneMax[n], n)
                                         self.coloneMax[n] -= 1
-                                        envoi(self.s, "P"+ str(n)+ "\n")
-                                        addtext(stdscr, self.y + self.hauteur + 2, self.x + self.tcolone,
-                                                "                             ")
-                                        addtext(stdscr, self.y + self.hauteur + 3, self.x + self.tcolone, " ")
+                                        # envoi(self.s, "P"+ str(n)+ "\n")
 
-                                        addtext(stdscr, self.y + self.hauteur + 3, self.x + self.tcolone + 1, "   ")
+                                        addtext(stdscr, 3, 3, str(n))
                                         break
 
 
-                            else:
-                                addtext(stdscr, self.y + self.hauteur + 3, self.x + self.tcolone+1, "   ")
-                                break
+    def choice(self):
+        #-1 => help
+        #-2 => quit
+
+        addtext(stdscr, self.y + self.hauteur + 3, self.x + self.largeur // 2, "> HELP <", True)
+        addtext(stdscr, self.y + self.hauteur + 5, self.x + self.largeur // 2, "> GIVE UP & QUIT <", True)
+        tmp = self.nbcolone//2
+        self.affGr()
+        self.colorGrColumn(tmp,self.grColor)
+
+        while 1:
+
+            key = stdscr.getch()
+
+            if key == curses.KEY_UP and tmp < 0:
+                tmp +=1
+                if tmp == 0:
+                    tmp = tmp = self.nbcolone//2
+                    self.affGr()
+                    self.colorGrColumn(tmp, self.grColor)
+                    #DECOLORER HELP
+                    addtext(stdscr, self.y + self.hauteur +3, self.x + self.largeur//2,"> HELP <",True)
+                else:
+                    pass
+                    #colorer HELP
+                    #DECOLORER QUIT
+                    addtext(stdscr, self.y + self.hauteur + 3, self.x + self.largeur // 2, "> HELP <", True,
+                            curses.color_pair(self.grColor))
+                    addtext(stdscr, self.y + self.hauteur + 5, self.x + self.largeur // 2, "> GIVE UP & QUIT <", True)
+            elif key == curses.KEY_DOWN and key != -2:
+                if tmp >= 0:
+                    self.decolorGrColumn(tmp)
+                    tmp =-1
+                    self.affGr()
+                    # colorer HELP
+                    addtext(stdscr, self.y + self.hauteur +3, self.x + self.largeur//2,"> HELP <",True, curses.color_pair(self.grColor))
+                else:
+                    tmp =-2
+                    # DECOLORER HELP
+                    #COLORER QUIT
+
+                    addtext(stdscr, self.y + self.hauteur +3, self.x + self.largeur//2,"> HELP <",True)
+                    addtext(stdscr, self.y + self.hauteur +5, self.x + self.largeur//2,"> GIVE UP & QUIT <",True, curses.color_pair(self.grColor))
+
+
+            elif key == curses.KEY_RIGHT and tmp >= 0 and tmp < self.nbcolone:
+
+                self.decolorGrColumn(tmp)
+                tmp += 1
+                self.affGr()
+                self.colorGrColumn(tmp, self.grColor)
+
+            elif key == curses.KEY_LEFT and tmp > 0 and tmp <= self.nbcolone+1:
+
+                self.decolorGrColumn(tmp)
+                tmp -= 1
+                self.affGr()
+                self.colorGrColumn(tmp, self.grColor)
+
+            elif key == 32 or key == 77 or key == curses.KEY_ENTER or key == 10:
+                if tmp >= 0:
+                    self.decolorGrColumn(tmp)
+                    self.affGr()
+                    return tmp
+                elif tmp ==-1:
+                    self.affHGr()
+
+
+    def colorGrColumn(self, x, colorn):
+
+        for k in range(self.tcolone +1):
+            addtext(stdscr,self.y, self.x+ x*(self.tcolone+1) +k ,self.chargrilleLg,False, curses.color_pair(colorn))
+            addtext(stdscr,self.y+self.hauteur, self.x+ x*(self.tcolone+1) +k ,self.chargrilleLg,False, curses.color_pair(colorn))
+
+        for k in range(self.hauteur+1):
+
+            addtext(stdscr,self.y+k, self.x+ x*(self.tcolone+1) ,self.chargrilleCl,False, curses.color_pair(colorn))
+            addtext(stdscr,self.y+k, self.x+ x*(self.tcolone+1) +self.tcolone+1 ,self.chargrilleCl,False, curses.color_pair(colorn))
 
 
 
@@ -816,13 +980,27 @@ class puissanceq():
     def affHGr(self):
         if self.help:
             self.help = False
+
+            addtext(stdscr, self.y -3, self.x + self.largeur//2, "                                                                    ", True)
             for k in range(self.nbcolone):
+
                 addtext(stdscr, self.y - 1, self.x + self.tcolone // 2 + k + k * self.tcolone, " ")
         else:
             self.help = True
+            addtext(stdscr, self.y -3, self.x + self.largeur//2, "> Select a row with array key and press 'Space' or 'Enter' to play <", True)
+
             for k in range(self.nbcolone):
                 addtext(stdscr, self.y - 1, self.x + self.tcolone // 2 + k + k * self.tcolone, str(k))
 
+    def decolorGrColumn(self,x):
+        for k in range(self.tcolone +1):
+            addtext(stdscr,self.y, self.x+ x*(self.tcolone+1) +k , " ",False)
+            addtext(stdscr,self.y+self.hauteur, self.x+ x*(self.tcolone+1) +k , " ", False)
+
+        for k in range(self.hauteur+1):
+
+            addtext(stdscr,self.y+k, self.x+ x*(self.tcolone+1) , " ",False)
+            addtext(stdscr,self.y+k, self.x+ x*(self.tcolone+1) +self.tcolone+1 ," ",False)
     def affGr(self):
         # add columns
         for k in range(self.nbcolone + 1):
@@ -851,7 +1029,6 @@ def endofGame(stdscr,r1,y,x):
         t.sleep(2)
         return 0
     elif "E" in r1:
-
         stdscr.clear()
         addtext(stdscr, y, x, "Equality", True, curses.color_pair(3))
         t.sleep(2)
@@ -978,7 +1155,8 @@ def r(stdscr):
 class Menu:
     # HOSTd = '2.3.130.203'
     PORTd = 45703
-    HOSTd = '192.168.43.254'
+    HOSTd = '127.0.0.1'
+    #HOSTd = '192.168.43.254'
 
     nom = ""
 
@@ -988,7 +1166,7 @@ class Menu:
         self.x = x
         self.connected = False
         self.items = ['> Connect', '> Games', '> Settings', '> Exit']
-        self.gamesItems = ['> Morpion', '> Puissance 4', '> Bataille Navale', '> TRON','> Back to main menu']
+        self.gamesItems = ['> Morpion', '> Puissance 4', '> Bataille Navale', '> TRON', '> Othello','> Back to main menu']
         self.settingsItems = ['> Change username', '> Back to main menu']
 
         self.initusr()
@@ -1085,7 +1263,7 @@ class Menu:
                 current_row -= 1
             elif key == curses.KEY_DOWN and current_row < len(self.items) - 1:
                 current_row += 1
-            elif key == curses.KEY_RIGHT or key == 77:
+            elif key == curses.KEY_RIGHT or key == 77 or key == curses.KEY_ENTER or key == 10:
                 self.print_center(self.items[current_row])
                 # self.stdscr.getch()
                 # if user selected last row, exit the program
@@ -1141,7 +1319,7 @@ class Menu:
                 current_row -= 1
             elif key == curses.KEY_DOWN and current_row < len(self.gamesItems) - 1:
                 current_row += 1
-            elif key == curses.KEY_RIGHT or key == 77:
+            elif key == curses.KEY_RIGHT or key == 77 or key == curses.KEY_ENTER or key == 10:
                 self.print_gamescenter(self.gamesItems[current_row])
 
                 # self.stdscr.getch()
@@ -1184,6 +1362,8 @@ class Menu:
                 self.stdscr.getch()
                 return 0
         elif text == '> Puissance 4':
+
+            puissanceq(None, h, w, 5)
             if self.connected:
                 self.lunchGame(y,x, "Puissance")
                 puissanceq(self.s, h, w, 5)
@@ -1208,10 +1388,13 @@ class Menu:
                 addtext(stdscr, y, x, "You must be connected to the server to play", True)
                 self.stdscr.getch()
                 return 0
+        elif text == '> Othello':
+                othello(None, h,w)
+                t.sleep(5)
         r(self.stdscr)
 
     def minitConnect(self, first=True):
-        txt = "Enter server hostname (default" + str(self.HOSTd) + ")"
+        txt = "Enter server hostname (default " + str(self.HOSTd) + ")"
         h, w = stdscr.getmaxyx()
         x = w // 2 - len(txt) // 2
         y = h // 2 - 3
@@ -1222,7 +1405,7 @@ class Menu:
 
         addtext(stdscr, y - 2, x, "Enter \'quit\' to exit this menu")
         addtext(stdscr, y, x, txt)
-        addtext(stdscr, y + 3, x, "Enter server port (default" + str(self.PORTd) + ")")
+        addtext(stdscr, y + 3, x, "Enter server port (default " + str(self.PORTd) + ")")
 
         addtext(stdscr, y + 1, x, ">")
         HOST = gettxt(stdscr, y + 1, x + 1, 15)
@@ -1284,7 +1467,7 @@ class Menu:
                 current_row -= 1
             elif key == curses.KEY_DOWN and current_row < len(self.settingsItems) - 1:
                 current_row += 1
-            elif key == curses.KEY_RIGHT or key ==77:
+            elif key == curses.KEY_RIGHT or key ==77 or key == curses.KEY_ENTER or key == 10:
                 self.print_settingscenter(self.settingsItems[current_row])
 
                 # self.stdscr.getch()
