@@ -54,6 +54,7 @@ public class Client extends Thread {
 					}
 					break;
 				case PUISSANCE:
+				case TRON:
 				case MORPION:
 					if (str.startsWith("P")) {
 						synchronized (this) {
