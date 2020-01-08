@@ -1,8 +1,9 @@
 package fr.dome.games;
 
 import java.util.List;
+
 import fr.dome.server.Client;
-import fr.dome.server.Lobby;
+import fr.dome.server.MainLobby;
 
 public abstract class Game extends Thread {
 
@@ -59,8 +60,7 @@ public abstract class Game extends Thread {
 		}
 		while (!clients.isEmpty()) {
 			Client client = clients.get(0);
-			client.clearGameState();
-			Lobby.getInstance().insertClient(client);
+			MainLobby.getInstance().insertClient(client);
 			clients.remove(client);
 		}
 	}

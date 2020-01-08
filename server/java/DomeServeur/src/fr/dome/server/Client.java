@@ -12,7 +12,6 @@ public class Client extends Thread {
 	private final int id; // Id du client.
 	private ClientCommunicationHandler communication;
 	private String pseudo = null;
-	private GameState state = GameState.LOBBY;
 	private String buffer = new String();
 
 	public Client(Socket socket) {
@@ -26,7 +25,7 @@ public class Client extends Thread {
 	}
 
 	public void preStop() {
-		Lobby.getInstance().disconnect(this);
+		MainLobby.getInstance().disconnect(this);
 		System.out.println("Client " + id + " disconnected");
 	}
 
@@ -35,50 +34,28 @@ public class Client extends Thread {
 		while (true) {
 			try {
 				String str = getCommunicationHandler().read();
-
-				switch (state) {
-				case LOBBY:
-					if (str.startsWith("NC")) {
-						pseudo = str.substring(2);
-						getCommunicationHandler().setPseudo(pseudo);
-						// System.out.println("Client " + id + " logged as " + pseudo);
-					} else if (str.startsWith("\n")) {
-						preStop();
-						return;
-					} else {
-						for (GameState g : GameState.values()) {
-							if (g != GameState.LOBBY)
-								if (str.startsWith(g.getCode()))
-									state = g;
-						}
+				if (str.startsWith("NC")) { // Choix du pseudo
+					pseudo = str.substring(2);
+					getCommunicationHandler().setPseudo(pseudo);
+					// System.out.println("Client " + id + " logged as " + pseudo);
+				} else if (str.startsWith("\n")) { // Déconnexion
+					preStop();
+					return;
+				} else if (str.startsWith("P") || str.startsWith("B")) { // Game Letters
+					synchronized (this) {
+						buffer = str;
+						notifyAll();
 					}
-					break;
-				case PUISSANCE:
-				case TRON:
-				case MORPION:
-					if (str.startsWith("P")) {
-						synchronized (this) {
-							//System.out.println(str);
-							buffer = str;
-							notifyAll();
-						}
-					}
-					break;
-				case BATTLESHIP:
-					if (str.startsWith("P") || str.startsWith("B")) {
-						synchronized (this) {
-							buffer = str;
-							notifyAll();
-						}
-					}
-					break;
-
+				} else if (str.startsWith("Q")) { // Insertion dans une partie
+					Lobbies.insert(this, str);
+					MainLobby.getInstance().remove(this);
 				}
 			} catch (NullPointerException e) {
 				preStop();
 				return;
 			}
 		}
+
 	}
 
 	public boolean isInitialized() {
@@ -95,14 +72,6 @@ public class Client extends Thread {
 
 	public void clearBuffer() {
 		buffer = null;
-	}
-
-	public GameState getGameState() {
-		return state;
-	}
-
-	public void clearGameState() {
-		state = GameState.LOBBY;
 	}
 
 	public String getPseudo() {

@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
 
-public class Lobby extends Thread {
+public class MainLobby extends Thread {
 
 	private static final int ERROR_SERVER = 2;
 	volatile private static boolean isRunning = true;
@@ -12,12 +12,10 @@ public class Lobby extends Thread {
 
 	private static final int PORT = 45703;
 	private static ServerSocket socket;
-	private static GameLauncher launcher;
 
-	private static Lobby lobby;
+	private static MainLobby lobby;
 
-	private Lobby() {
-		launcher = new GameLauncher(clients);
+	private MainLobby() {
 		try {
 			socket = new ServerSocket(PORT);
 			System.out.println(socket.getInetAddress().toString());
@@ -29,7 +27,6 @@ public class Lobby extends Thread {
 
 	@Override
 	public void run() {
-		launcher.start();
 		try {
 			while (isRunning) {
 				Client c = new Client(socket.accept());
@@ -41,9 +38,9 @@ public class Lobby extends Thread {
 		}
 	}
 
-	public static synchronized Lobby getInstance() {
+	public static synchronized MainLobby getInstance() {
 		if (lobby == null)
-			lobby = new Lobby();
+			lobby = new MainLobby();
 		return lobby;
 	}
 
@@ -59,5 +56,17 @@ public class Lobby extends Thread {
 		synchronized (clients) {
 			clients.remove(client);
 		}
+	}
+
+	public void remove(Client client) {
+		clients.remove(client);
+	}
+
+	public int getNumberOfClients() {
+		return clients.size();
+	}
+
+	public Client getClient(int i) {
+		return clients.get(i);
 	}
 }
