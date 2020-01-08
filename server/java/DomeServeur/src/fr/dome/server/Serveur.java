@@ -22,6 +22,10 @@ public class Serveur {
 				for (Client c : MainLobby.getInstance().getPlayerList())
 					System.out.println("\t - " + c.getClientId() + " : " + c.getPseudo());
 				break;
+			case "list -g":
+				for (Lobbies.GameLobby l : Lobbies.getInstance().games_list.values()) {
+					System.out.println(l.size());
+				}
 			}
 		}
 

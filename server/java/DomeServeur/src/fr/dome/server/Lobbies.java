@@ -1,25 +1,15 @@
 package fr.dome.server;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import fr.dome.games.GameState;
 
-public class Lobbies extends Thread {
-	private HashMap<String, GameLobby> games_list = new HashMap<String, GameLobby>();
+public class Lobbies {
+	public HashMap<String, GameLobby> games_list = new HashMap<String, GameLobby>();
 	private static Lobbies instance;
-
-	private Lobbies() {
-		this.start();
-	}
-
-	@Override
-	public void run() {
-		super.run();
-
-		while (true) {
-		}
-	}
 
 	public static synchronized Lobbies getInstance() {
 		if (instance == null)
@@ -42,12 +32,29 @@ public class Lobbies extends Thread {
 		}
 	}
 
-	public static void insert(Client client, String str) {
-		try {
-			GameLobby gl = Lobbies.getInstance().new GameLobby(GameState.valueOf(str.substring(0, str.length() - 4)));
-			gl.add(client);
-		} catch (IllegalArgumentException e) {
-			System.out.println("Impossible d'ajouter le client, le jeu n'existe pas");
+	public void insert(Client client, String str) {
+		String key = str.substring(str.length() - 4, str.length());
+		String game = str.substring(0, str.length() - 4);
+
+		
+		if (Lobbies.getInstance().games_list.containsKey(key)) {
+			Lobbies.getInstance().games_list.get(key).add(client);
+			if (Lobbies.getInstance().games_list.get(key).size() == 2) {
+				try {
+					Lobbies.getInstance().games_list.get(key).getState().getGameClass().getConstructor(List.class).newInstance(Lobbies.getInstance().games_list.get(key)).start();
+				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+						| InvocationTargetException | NoSuchMethodException | SecurityException e) {
+					e.printStackTrace();
+				}
+			}
+		} else {
+			try {
+				GameLobby gl = new GameLobby(GameState.valueOf(game.toUpperCase()));
+				gl.add(client);
+				Lobbies.getInstance().games_list.put(key, gl);
+			} catch (IllegalArgumentException e) {
+				System.out.println("Impossible d'ajouter le client, le jeu n'existe pas");
+			}
 		}
 	}
 }

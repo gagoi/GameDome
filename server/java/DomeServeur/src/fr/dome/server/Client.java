@@ -46,8 +46,8 @@ public class Client extends Thread {
 						buffer = str;
 						notifyAll();
 					}
-				} else if (str.startsWith("Q")) { // Insertion dans une partie
-					Lobbies.insert(this, str);
+				} else if (GameState.isGameCode(str)) { // Insertion dans une partie
+					Lobbies.getInstance().insert(this, str);
 					MainLobby.getInstance().remove(this);
 				}
 			} catch (NullPointerException e) {
