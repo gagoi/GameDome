@@ -36,7 +36,6 @@ public class Lobbies {
 		String key = str.substring(str.length() - 4, str.length());
 		String game = str.substring(0, str.length() - 4);
 
-		
 		if (Lobbies.getInstance().games_list.containsKey(key)) {
 			Lobbies.getInstance().games_list.get(key).add(client);
 			if (Lobbies.getInstance().games_list.get(key).size() == 2) {

@@ -41,14 +41,14 @@ public class Client extends Thread {
 				} else if (str.startsWith("\n")) { // Déconnexion
 					preStop();
 					return;
-				} else if (str.startsWith("P") || str.startsWith("B")) { // Game Letters
+				} else if (GameState.isGameCode(str)) { // Insertion dans une partie
+					Lobbies.getInstance().insert(this, str);
+					MainLobby.getInstance().remove(this);
+				} else if (str.startsWith("P") || str.startsWith("B") || str.startsWith("Q")) { // Game Letters
 					synchronized (this) {
 						buffer = str;
 						notifyAll();
 					}
-				} else if (GameState.isGameCode(str)) { // Insertion dans une partie
-					Lobbies.getInstance().insert(this, str);
-					MainLobby.getInstance().remove(this);
 				}
 			} catch (NullPointerException e) {
 				preStop();
