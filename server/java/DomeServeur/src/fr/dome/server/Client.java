@@ -3,7 +3,7 @@ package fr.dome.server;
 import java.io.IOException;
 import java.net.Socket;
 
-import fr.dome.games.GameState;
+import fr.dome.game.games.GameState;
 
 public class Client extends Thread {
 

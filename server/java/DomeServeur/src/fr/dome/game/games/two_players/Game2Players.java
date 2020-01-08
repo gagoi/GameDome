@@ -1,7 +1,8 @@
-package fr.dome.games;
+package fr.dome.game.games.two_players;
 
 import java.util.List;
 
+import fr.dome.game.Game;
 import fr.dome.server.Client;
 
 abstract public class Game2Players extends Game {

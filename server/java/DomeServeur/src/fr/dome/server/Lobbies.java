@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import fr.dome.games.GameState;
+import fr.dome.game.games.GameState;
 
 public class Lobbies {
 	public HashMap<String, GameLobby> games_list = new HashMap<String, GameLobby>();
@@ -39,7 +39,7 @@ public class Lobbies {
 		
 		if (Lobbies.getInstance().games_list.containsKey(key)) {
 			Lobbies.getInstance().games_list.get(key).add(client);
-			if (Lobbies.getInstance().games_list.get(key).size() == 2) {
+			if (Lobbies.getInstance().games_list.get(key).size() == GameState.valueOf(game.toUpperCase()).getNbPlayers()) {
 				try {
 					Lobbies.getInstance().games_list.get(key).getState().getGameClass().getConstructor(List.class).newInstance(Lobbies.getInstance().games_list.get(key)).start();
 				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
