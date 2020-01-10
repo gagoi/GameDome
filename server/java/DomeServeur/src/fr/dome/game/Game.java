@@ -1,4 +1,4 @@
-package fr.dome.games;
+package fr.dome.game;
 
 import java.util.List;
 

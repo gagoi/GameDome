@@ -1,4 +1,4 @@
-package fr.dome.games;
+package fr.dome.game.games.two_players;
 
 import java.awt.Point;
 import java.util.List;
