@@ -9,8 +9,8 @@ abstract public class Game2Players extends Game {
 	protected Client other;
 	protected int otherId;
 	
-	public Game2Players(List<Client> clients ) {
-		super(clients, 2);
+	public Game2Players(String gameCode, List<Client> clients ) {
+		super(gameCode, clients, 2);
 		otherId = (turn + 1) % 2;
 		other = clients.get(otherId);
 	}

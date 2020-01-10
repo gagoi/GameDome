@@ -10,8 +10,8 @@ public class Tron extends Game2Players {
 	private static final int WIDTH = 15;
 	private static final int HEIGHT = 10;
 
-	public Tron(List<Client> clients) {
-		super(clients);
+	public Tron(String gameCode, List<Client> clients) {
+		super(gameCode, clients);
 	}
 
 	@Override

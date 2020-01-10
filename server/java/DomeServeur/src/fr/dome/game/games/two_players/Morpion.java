@@ -9,8 +9,8 @@ public class Morpion extends Game2Players {
 	private static final char[] TOKENS = { 'X', 'O' };
 	private char grid[][] = { { ' ', ' ', ' ' }, { ' ', ' ', ' ' }, { ' ', ' ', ' ' } };
 
-	public Morpion(List<Client> clients) {
-		super(clients);
+	public Morpion(String gameCode, List<Client> clients) {
+		super(gameCode, clients);
 	}
 
 	protected void draw() {

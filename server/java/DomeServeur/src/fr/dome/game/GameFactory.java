@@ -16,9 +16,9 @@ public class GameFactory {
 		return gf;
 	}
 	
-	public Game createGame(GameState s, List<Client> players) {
+	public Game createGame(GameState s, String gameCode, List<Client> players) {
 		try {
-			return s.getGameClass().getDeclaredConstructor(List.class).newInstance(players);
+			return s.getGameClass().getDeclaredConstructor(String.class, List.class).newInstance(gameCode, players);
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
 				| NoSuchMethodException | SecurityException e) {
 			e.printStackTrace();

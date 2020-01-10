@@ -3,6 +3,7 @@ package fr.dome.game;
 import java.util.List;
 
 import fr.dome.server.Client;
+import fr.dome.server.Lobbies;
 import fr.dome.server.MainLobby;
 
 public abstract class Game extends Thread {
@@ -13,14 +14,16 @@ public abstract class Game extends Thread {
 	protected boolean hasWin = false;
 	protected String buffer = null;
 	protected int winner;
+	private String gameCode;
 	
 	protected boolean stop;
 
 	protected Client actual;
 
-	public Game(List<Client> clients, int nbPlayers) {
+	public Game(String gameCode, List<Client> clients, int nbPlayers) {
 		this.nbPlayers = nbPlayers;
 		this.clients = clients;
+		this.gameCode = gameCode;
 		this.turn = (int) (Math.random() * nbPlayers);
 		actual = clients.get(turn); 
 	}
@@ -63,6 +66,7 @@ public abstract class Game extends Thread {
 			MainLobby.getInstance().insertClient(client);
 			clients.remove(client);
 		}
+		Lobbies.getInstance().games_list.remove(gameCode);
 	}
 
 	static public int getNbPlayers() {

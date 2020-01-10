@@ -9,8 +9,8 @@ public class Puissance4 extends Game2Players {
 	private int[][] grid = new int[6][7];
 	private int lastP, lastY;
 
-	public Puissance4(List<Client> clients) {
-		super(clients);
+	public Puissance4(String gameCode, List<Client> clients) {
+		super(gameCode, clients);
 	}
 
 	@Override

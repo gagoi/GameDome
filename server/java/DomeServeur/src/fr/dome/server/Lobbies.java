@@ -41,13 +41,9 @@ public class Lobbies {
 		if (Lobbies.getInstance().games_list.containsKey(key)) {
 			Lobbies.getInstance().games_list.get(key).add(client);
 			if (Lobbies.getInstance().games_list.get(key).size() == GameState.valueOf(game).getNbPlayers()) {
-				try {
-					Game g = GameFactory.getInstance().createGame(GameState.valueOf(game), Lobbies.getInstance().games_list.get(key));
-					Lobbies.getInstance().games_list.get(key).getState().getGameClass().getConstructor(List.class).newInstance(Lobbies.getInstance().games_list.get(key)).start();
-				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-						| InvocationTargetException | NoSuchMethodException | SecurityException e) {
-					e.printStackTrace();
-				}
+				Game g = GameFactory.getInstance().createGame(GameState.valueOf(game), key,
+						Lobbies.getInstance().games_list.get(key));
+				g.start();
 			}
 		} else {
 			try {

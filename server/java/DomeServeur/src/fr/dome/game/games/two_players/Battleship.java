@@ -9,8 +9,8 @@ import fr.dome.server.Client;
 public class Battleship extends Game2Players {
 	ArrayList<ArrayList<Boat>> boats = new ArrayList<ArrayList<Boat>>(2);
 
-	public Battleship(List<Client> clients) {
-		super(clients);
+	public Battleship(String gameCode, List<Client> clients) {
+		super(gameCode, clients);
 	}
 
 	@Override
