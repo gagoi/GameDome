@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import fr.dome.game.Game;
+import fr.dome.game.GameFactory;
 import fr.dome.game.games.GameState;
 
 public class Lobbies {
@@ -34,13 +36,14 @@ public class Lobbies {
 
 	public void insert(Client client, String str) {
 		String key = str.substring(str.length() - 4, str.length());
-		String game = str.substring(0, str.length() - 4);
+		String game = str.substring(0, str.length() - 4).toUpperCase();
 
 		
 		if (Lobbies.getInstance().games_list.containsKey(key)) {
 			Lobbies.getInstance().games_list.get(key).add(client);
-			if (Lobbies.getInstance().games_list.get(key).size() == GameState.valueOf(game.toUpperCase()).getNbPlayers()) {
+			if (Lobbies.getInstance().games_list.get(key).size() == GameState.valueOf(game).getNbPlayers()) {
 				try {
+					Game g = GameFactory.getInstance().createGame(GameState.valueOf(game), Lobbies.getInstance().games_list.get(key));
 					Lobbies.getInstance().games_list.get(key).getState().getGameClass().getConstructor(List.class).newInstance(Lobbies.getInstance().games_list.get(key)).start();
 				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 						| InvocationTargetException | NoSuchMethodException | SecurityException e) {
@@ -49,7 +52,7 @@ public class Lobbies {
 			}
 		} else {
 			try {
-				GameLobby gl = new GameLobby(GameState.valueOf(game.toUpperCase()));
+				GameLobby gl = new GameLobby(GameState.valueOf(game));
 				gl.add(client);
 				Lobbies.getInstance().games_list.put(key, gl);
 			} catch (IllegalArgumentException e) {
