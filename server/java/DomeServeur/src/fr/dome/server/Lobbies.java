@@ -7,7 +7,7 @@ import java.util.List;
 
 import fr.dome.game.Game;
 import fr.dome.game.GameFactory;
-import fr.dome.game.games.GameState;
+import fr.dome.game.GameState;
 
 public class Lobbies {
 	public HashMap<String, GameLobby> games_list = new HashMap<String, GameLobby>();

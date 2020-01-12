@@ -3,7 +3,6 @@ package fr.dome.game;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
-import fr.dome.game.games.GameState;
 import fr.dome.server.Client;
 
 public class GameFactory {

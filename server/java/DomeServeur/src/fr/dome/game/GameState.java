@@ -1,8 +1,7 @@
-package fr.dome.game.games;
+package fr.dome.game;
 
 import java.util.Arrays;
 
-import fr.dome.game.Game;
 import fr.dome.game.games.two_players.Battleship;
 import fr.dome.game.games.two_players.Morpion;
 import fr.dome.game.games.two_players.Puissance4;

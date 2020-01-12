@@ -3,7 +3,7 @@ package fr.dome.server;
 import java.io.IOException;
 import java.net.Socket;
 
-import fr.dome.game.games.GameState;
+import fr.dome.game.GameState;
 
 public class Client extends Thread {
 
@@ -38,13 +38,13 @@ public class Client extends Thread {
 					pseudo = str.substring(2);
 					getCommunicationHandler().setPseudo(pseudo);
 					// System.out.println("Client " + id + " logged as " + pseudo);
-				} else if (str.startsWith("\n")) { // Déconnexion
+				} else if (str.startsWith("\n") || str.startsWith("Q") ) { // Déconnexion
 					preStop();
 					return;
 				} else if (GameState.isGameCode(str)) { // Insertion dans une partie
 					Lobbies.getInstance().insert(this, str);
 					MainLobby.getInstance().remove(this);
-				} else if (str.startsWith("P") || str.startsWith("B") || str.startsWith("Q")) { // Game Letters
+				} else if (str.startsWith("P") || str.startsWith("B")) { // Game Letters
 					synchronized (this) {
 						buffer = str;
 						notifyAll();
